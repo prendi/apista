@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+       <extension point="org.eclipse.jdt.ui.javaCompletionProposalSorters">
+      <proposalSorter
+            class="pt.iscte.apista.eclipse.ApistaSorter"
+            id="pt.iscte.apista.eclipse.Sorter"
+            name="APISTA">
+      </proposalSorter>
+   </extension>
+   </plugin>

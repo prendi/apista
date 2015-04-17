@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Examples
+Bundle-SymbolicName: pt.iscte.apista.examples
+Bundle-Version: 1.0.0.qualifier
+Export-Package: pt.iscte.apista.examples
+Require-Bundle: org.eclipse.swt;bundle-version="3.103.2"
