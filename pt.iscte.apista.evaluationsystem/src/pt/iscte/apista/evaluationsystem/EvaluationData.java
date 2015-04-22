@@ -1,6 +1,5 @@
 package pt.iscte.apista.evaluationsystem;
 
-import java.io.File;
 
 /**
  * 
@@ -108,6 +107,12 @@ public class EvaluationData {
 			}
 			return index;
 		}
+		
+		private boolean checkForProposals(){
+			if(totalProposed == 0 && totalNotProposed == 0)
+				return false;
+			return true;
+		}
 
 		/**
 		 * 
@@ -116,6 +121,9 @@ public class EvaluationData {
 		 */
 		
 		public double getIndexCoverPercentage(int index) {
+			if(!checkForProposals())
+				return 0;
+			
 			return (double) indexes[index]
 					/ (double) (totalProposed + totalNotProposed);
 		}
@@ -139,6 +147,10 @@ public class EvaluationData {
 		 * @return Cover percentage for the total number of instructions proposed
 		 */
 		public double getTotalProposedPercentage() {
+			
+			if(!checkForProposals())
+				return 0;
+			
 			return (double) totalProposed
 					/ (double) (totalProposed + totalNotProposed);
 
@@ -149,19 +161,13 @@ public class EvaluationData {
 		 * @return Cover percentage for the total number of instructions that were not proposed
 		 */
 		public double getTotalNotProposedPercentage() {
+			
+			if(!checkForProposals())
+				return 0;
+			
 			return (double) totalNotProposed
 					/ (double) (totalProposed + totalNotProposed);
 
 		}
 
-		/**
-		 * Exports this evaluation data to csv format
-		 * @param f
-		 * @param scheme
-		 */
-		public void toCSV(File f, CSVScheme scheme) {
-			//TODO
-			throw new UnsupportedOperationException();
-		}
-	
 }

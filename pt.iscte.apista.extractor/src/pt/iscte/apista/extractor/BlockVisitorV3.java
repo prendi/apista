@@ -1,5 +1,6 @@
 package pt.iscte.apista.extractor;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -373,15 +375,21 @@ public class BlockVisitorV3 extends ASTVisitor{
 
 	@Override
 	public void endVisit(MethodInvocation node) {
+		
 		Expression e = node.getExpression();
 		if(e != null) {
 			ITypeBinding binding = e.resolveTypeBinding();
+				
 			if(includePackage(binding)) {
-				Instruction inst = new MethodInstruction(node, binding);
+				IMethodBinding mBinding = node.resolveMethodBinding();
+				boolean isStatic = mBinding != null && Modifier.isStatic(mBinding.getModifiers());
+				Instruction inst = new MethodInstruction(node, binding, isStatic);
 				InstructionLine instLine = new InstructionLine(inst, inst.line);
 				addInstruction(node, instLine);
+				
 			}
 		}
+		
 	}
 	
 	@Override

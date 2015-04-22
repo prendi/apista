@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import pt.iscte.apista.core.SystemConfiguration;
+import pt.iscte.apista.evaluationsystem.methods.CrossValidation;
 
 public class Evaluator {
 
@@ -17,17 +18,15 @@ public class Evaluator {
 	}
 	
 	private static void runEvaluator() {
-		SystemConfiguration configuration = new SystemConfiguration();
+		SystemConfiguration configuration = new SystemConfiguration("C:/Users/Gonçalo/Dropbox/Thesis/Code/Resources/config.properties");
 //		configuration.showSystemConfiguration();
 		
 //		Analyzer.run(true);
 
-//		Analyzer analyzer = configuration.getAnalyzer();
+		CrossValidation cv = new CrossValidation(configuration, 10);
 //
-//		CrossValidation cv = new CrossValidation(configuration, 10);
-//
-//		cv.evaluate();
-//		cv.reportData();
+		cv.evaluate();
+		cv.reportData();
 		
 		
 		

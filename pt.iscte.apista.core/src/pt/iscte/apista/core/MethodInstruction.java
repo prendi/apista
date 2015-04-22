@@ -9,23 +9,25 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 public class MethodInstruction extends Instruction {
 
 	private final String methodName;
-	private boolean isStatic; // TODO
+	private boolean isStatic; // not considered for equals()
 
-	public MethodInstruction(MethodInvocation node, ITypeBinding binding) {
+	public MethodInstruction(MethodInvocation node, ITypeBinding binding, boolean isStatic) {
 		super(node, binding);
 		methodName = node.getName().getFullyQualifiedName();
-		isStatic = false;
+		this.isStatic = isStatic;
 	}
 
 	public MethodInstruction(String qualifiedName, String methodName) {
 		super(qualifiedName);
 		this.methodName = methodName;
+		this.isStatic = false;
 	}
 
 	public String getMethodName() {
@@ -67,7 +69,11 @@ public class MethodInstruction extends Instruction {
 					if(m instanceof IMethod && ((IMethod)m).getElementName().equals(methodName)) {
 						IMethod method = (IMethod) m;
 						params = inferParameters(type, method, vars, typeCache);
-//						if(method.getReturnType())
+					
+						// TODO rever Signature
+						String sig = method.getReturnType();
+						if(sig.charAt(0) != Signature.C_VOID)
+							returnType = Signature.toString(sig);
 					}
 		}
 		catch (JavaModelException e) {
@@ -75,7 +81,7 @@ public class MethodInstruction extends Instruction {
 		}
 
 		// TODO: return type
-		return var + "." + methodName + "(" + params + ")";
+		return (returnType != null ? returnType + " " + returnType.toLowerCase() : "") + var + "." + methodName + "(" + params + ")";
 	}
 
 	@Override

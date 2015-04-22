@@ -36,7 +36,7 @@ public class CrossValidation extends ACrossEvaluationMethod {
 			
 			
 			for (EvaluationData data : dataList) {
-
+				
 				for (int i = 0; i != maxProposals; i++) {
 
 					indexes[i] += data.getValueFromIndex(i);

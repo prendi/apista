@@ -15,7 +15,7 @@ import pt.iscte.apista.core.Instruction;
 import pt.iscte.apista.core.Sentence;
 import pt.iscte.apista.core.SystemConfiguration;
 
-public class Analyzer implements Serializable, IAnalyzer {
+public class Analyzer implements IAnalyzer, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -24,8 +24,8 @@ public class Analyzer implements Serializable, IAnalyzer {
 	private int nFiles;
 	private String packageRoot;
 	private Filter[] filters;
-	
-	
+
+
 	public Filter[] getFilters() {
 		return filters;
 	}
@@ -39,10 +39,10 @@ public class Analyzer implements Serializable, IAnalyzer {
 		packageRoot = "";
 	}
 
-//	public Analyzer(String packageRoot) {
-//		this.packageRoot = packageRoot;
-//		sentences = new ArrayList<>();
-//	}
+	//	public Analyzer(String packageRoot) {
+	//		this.packageRoot = packageRoot;
+	//		sentences = new ArrayList<>();
+	//	}
 
 
 	public Sentence newSentence(int startLine) {
@@ -75,12 +75,12 @@ public class Analyzer implements Serializable, IAnalyzer {
 			double progress = i / (double) sentences.size();
 			if (accept(progress)) {
 				list.add(sentences.get(i));
-//				System.out.println("PROGRESS: " + progress);
+				//				System.out.println("PROGRESS: " + progress);
 			}
 		}
 		return list;
 	}
-	
+
 	public List<Sentence> getAllSentences(){
 		return sentences;
 	}
@@ -113,6 +113,9 @@ public class Analyzer implements Serializable, IAnalyzer {
 		parse(new File(repositoryRoot), libSrcRoot);
 		time = (System.currentTimeMillis() - t) / 1000;
 	}
+
+
+
 
 	public long getTime() {
 		return time;
@@ -177,19 +180,42 @@ public class Analyzer implements Serializable, IAnalyzer {
 	}
 
 	private String filePath;
+	//	private void parse(File file, String libSrc) {
+	//		
+	//		if (file.isFile() && file.getName().endsWith(".java")) {
+	//			filePath = file.getAbsolutePath();
+	//			
+	//			JavaSourceParser parser = JavaSourceParser.createFromFile(
+	//					filePath, libSrc, "UTF-8");
+	//		
+	//			BlockVisitorV3 v = new BlockVisitorV3(this);
+	//			try{
+	//				parser.parse(v);
+	//			}catch(Exception e ){
+	//				System.out.println("ERROR ON FILE: " + file.getAbsolutePath());
+	//			}
+	//			nFiles++;
+	//		} else if (file.isDirectory() && !file.getName().startsWith(".")) {
+	//			for (File c : file.listFiles())
+	//				parse(c, libSrc);
+	//		}
+	//	}
+
 	private void parse(File file, String libSrc) {
-		
+
 		if (file.isFile() && file.getName().endsWith(".java")) {
 			filePath = file.getAbsolutePath();
-			
-			JavaSourceParser parser = JavaSourceParser.createFromFile(
-					filePath, libSrc, "UTF-8");
-		
+
+//			JavaSourceParser parser = JavaSourceParser.createFromJar(
+//					filePath, libSrc);
+						JavaSourceParser parser = JavaSourceParser.createFromFile(filePath, libSrc, "UTF-8");
+
 			BlockVisitorV3 v = new BlockVisitorV3(this);
 			try{
 				parser.parse(v);
 			}catch(Exception e ){
 				System.out.println("ERROR ON FILE: " + file.getAbsolutePath());
+				e.printStackTrace();
 			}
 			nFiles++;
 		} else if (file.isDirectory() && !file.getName().startsWith(".")) {
@@ -197,6 +223,7 @@ public class Analyzer implements Serializable, IAnalyzer {
 				parse(c, libSrc);
 		}
 	}
+
 
 	public Sentence getFirst() {
 		return sentences.get(0);
@@ -206,13 +233,16 @@ public class Analyzer implements Serializable, IAnalyzer {
 	public void run(SystemConfiguration configuration) {
 
 		run(configuration.getLibRootPackage(), configuration.getRepPath(), configuration.getSrcPath());
-		
+
 	}
-	
+
 	public void run(String packageRoot, String repPath, String srcPath){
 		this.packageRoot = packageRoot;
 		sentences = new ArrayList<>();
 		parse(repPath, srcPath);
-		
 	}
+
+
+
+
 }

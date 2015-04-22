@@ -16,9 +16,11 @@ public class Util {
 		SystemConfiguration configuration = new SystemConfiguration(
 				"C:/Users/Gonçalo/Dropbox/Thesis/Code/Resources/config.properties");
 
-//		analyzer.run(configuration);
+		analyzer.run(configuration);
 		
-		analyzer = configuration.loadAnalyzerFromFile();
+//		analyzer = configuration.getAnalyzer();
+		
+		System.out.println(analyzer.getAllSentences().size());
 		
 		if (randomizeSentences)
 			analyzer.randomizeSentences(2015);

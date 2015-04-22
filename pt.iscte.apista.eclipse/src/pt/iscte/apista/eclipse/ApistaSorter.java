@@ -3,6 +3,7 @@ package pt.iscte.apista.eclipse;
 import java.util.List;
 
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.ui.text.java.JavaMethodCompletionProposal;
 import org.eclipse.jdt.ui.text.java.AbstractProposalSorter;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
@@ -114,6 +115,8 @@ public class ApistaSorter extends AbstractProposalSorter {
 			if (m1 == null || m2 == null)
 				return 0;
 
+			//Signature.
+			
 			MethodInstruction mi1 = new MethodInstruction(expectedType, m1.getElementName());
 			// double prob1 = SlapisProposalComputer.apiModel.probability(mi1,
 			// blockContext);

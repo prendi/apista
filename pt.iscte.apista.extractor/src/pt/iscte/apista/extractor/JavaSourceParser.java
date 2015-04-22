@@ -13,11 +13,11 @@ public class JavaSourceParser {
 	private final ASTParser parser;
 	private CompilationUnit unit;
 
-	private JavaSourceParser(String source, String className, String libSourceRoot, String encoding) {
+	private JavaSourceParser(String source, String className, String[] classpath, String[] libSourceRoot, String[] encodings) {
 		parser = ASTParser.newParser(AST.JLS8);
 		parser.setResolveBindings(true);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);		
-		parser.setEnvironment(null, new String[] {libSourceRoot}, new String[] {encoding}, true);
+		parser.setEnvironment(classpath, libSourceRoot, encodings, true);
 		parser.setUnitName(className);
 		parser.setSource(source.toCharArray());
 	}
@@ -25,13 +25,20 @@ public class JavaSourceParser {
 	public static JavaSourceParser createFromFile(String javaFilePath, String libSourceRoot, String encoding) {
 		validateFilePath(javaFilePath);
 		validateLibSourceRoot(libSourceRoot);
-		return new JavaSourceParser(readFileToString(javaFilePath), getClassName(javaFilePath), libSourceRoot, encoding);
+		return new JavaSourceParser(readFileToString(javaFilePath), getClassName(javaFilePath), null, new String[]{libSourceRoot}, new String[]{encoding});
 	}
 	
 	public static JavaSourceParser createFromSource(String source, String className, String libSourceRoot, String encoding) {
 		validateLibSourceRoot(libSourceRoot);
-		return new JavaSourceParser(source, className, libSourceRoot, encoding);
+		return new JavaSourceParser(source, className, null, new String[] {libSourceRoot}, new String[] {encoding});
 	}
+	
+	public static JavaSourceParser createFromJar(String source, String jarFilePath) {
+		
+		return new JavaSourceParser(readFileToString(source), getClassName(source), new String[]{jarFilePath}, null, null);
+	}
+	
+	
 
 	private static void validateFilePath(String filePath) {
 		File f = new File(filePath);
