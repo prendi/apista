@@ -54,18 +54,10 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 
 	private Map<IType, ITypeHierarchy> cache = new HashMap<IType, ITypeHierarchy>();
 	
-	private 
 	//TODO: tmp
 	static APIModel apiModel;
 	static String libSrcRoot;
 
-	private class Model {
-		final APIModel model;
-		final String lib
-		final Image icon;
-	}
-	
-	private List<E>
 	private Map<APIModel,Image> icons;
 	
 	
@@ -85,7 +77,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 					
 					InputStream inputStream = fileURL.openConnection().getInputStream();
 					SystemConfiguration conf = new SystemConfiguration(inputStream);
-					libSrcRoot = conf.getSrcPath();
+					libSrcRoot = conf.getApiSrcPath();
 					model = (APIModel) api.createExecutableExtension("model");
 					apiModel = model;
 					apiModel.setup(conf.getModelParameters());
@@ -100,29 +92,8 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 				}
 			System.out.println(model);
 		}
-	}
-	
-	
-	
-	public ApistaProposalComputer(Class<? extends APIModel> modelClass, SystemConfiguration configuration) {
-
-		try {
-			apiModel = modelClass.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		apiModel.setup(configuration.getModelParameters());
-		libSrcRoot = configuration.getSrcPath();
-
-//		try {
-//			apiModel.load(new File(configuration.getModelFileName()));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-
-		//loadIcon(modelClass);
 		ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin("pt.iscte.apista.eclipse", "swt.gif");
-		icon = desc.createImage();
+		Image icon = desc.createImage();
 	}
 
 
@@ -166,29 +137,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 		}
 	}
 
-
-	private void loadIcon(Class<? extends APIModel> modelClass) {
-		IExtension[] exts = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.jdt.ui.javaCompletionProposalComputer").getExtensions();
-
-		for(IExtension e : exts) {
-			IConfigurationElement[] confs = e.getConfigurationElements();
-			String iconPath = null;
-			String id = null;
-			for(IConfigurationElement c : confs)
-				if(c.getName().equals("javaCompletionProposalComputer") &&
-						c.getAttribute("class").equals(modelClass.getName()))
-					id = c.getAttribute("categoryId");
-
-			for(IConfigurationElement c : confs)
-				if(c.getName().equals("proposalCategory") && e.getSimpleIdentifier().equals(id))
-					iconPath = c.getAttribute("icon");
-
-			if(id != null) {
-				ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin(e.getContributor().getName(), iconPath);
-				icon = desc.createImage();
-			}
-		}
-	}
+	
 
 
 	@Override
@@ -308,8 +257,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 
 	@Override
 	public Image getImage() {
-		// TODO: get icon from category
-		return icon;
+		return null;
 	}
 
 

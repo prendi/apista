@@ -1,6 +1,7 @@
 package pt.iscte.apista.evaluationsystem.abstracts;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -51,9 +52,9 @@ public abstract class AEvaluationMethod extends AEvaluator{
 		try {
 
 			File modelFile = new File(configuration.getResourceFolder() + configuration.getModelFileName());
-
 			if (modelFile.exists()) {
-				configuration.getModel().load(modelFile);
+				FileInputStream stream = new FileInputStream(modelFile);
+				configuration.getModel().load(stream);
 			}else{
 				throw new FileNotFoundException("Model file was not found when setting up the evaluation system");
 			}

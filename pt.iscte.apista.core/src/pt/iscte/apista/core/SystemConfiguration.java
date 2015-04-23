@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.util.EnumMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import pt.iscte.apista.core.Parametrizable.Parameters;
@@ -39,10 +40,9 @@ public class SystemConfiguration {
 	private static final String PARAMETERS_KEY = "params";
 	// Folder to output all the data (Model, Analyzer and results)
 	private static final String OUTPUT_FOLDER_KEY = "outputFolder";
-	//Folder to input all the data (Model, Analyzer)
+	// Folder to input all the data (Model, Analyzer)
 	private static final String RESOURCE_INPUT_FOLDER_KEY = "resourceFolder";
 
-	
 	private String outputFileName;
 	private String modelFilename;
 	private String analyzerFilename;
@@ -57,6 +57,8 @@ public class SystemConfiguration {
 	private Class<? extends APIModel> modelClass;
 	private int maxProposals;
 	private IAnalyzer analyzer;
+
+	private String[] apiSrcPath;
 
 	public SystemConfiguration() {
 		this(PROPERTIES_FILE_PATH);
@@ -90,20 +92,50 @@ public class SystemConfiguration {
 			srcPath = properties.getProperty(SRC_PATH_KEY);
 			libRootPackage = properties.getProperty(LIB_ROOT_PACKAGE_KEY);
 
-			maxProposals = Integer.parseInt(properties
-					.getProperty(MAX_PROPOSALS_KEY));
+			maxProposals = Integer.parseInt(properties.getProperty(MAX_PROPOSALS_KEY));
 
-			String[] rawParameters = splitProperties(properties
-					.getProperty(PARAMETERS_KEY));
+			String[] rawParameters = splitProperties(properties.getProperty(PARAMETERS_KEY));
 
 			modelParameters = convertRawParameters(rawParameters);
-		}
-		catch(IOException e) {
+			apiSrcPath = getSourcePathsFromRootFolder(srcPath, libRootPackage);
+
+		} catch (IOException e) {
+			System.err.println("Problem loading the system properties on PropertiesHolder");
 			e.printStackTrace();
 		}
 	}
 
-	public void dumpProperties(OutputStream os){
+	private static String[] getSourcePathsFromRootFolder(String rootFolder, String rootPackage) {
+		ArrayList<String> list = new ArrayList<>();
+		getFoldersContainingRootPackage(rootFolder, rootPackage.split("\\.")[0], list);
+
+		if (list.size() == 0)
+			throw new IllegalArgumentException("The root package " + rootPackage + " was not found in this directory");
+
+		return list.toArray(new String[list.size()]);
+	}
+
+	private static boolean getFoldersContainingRootPackage(String rootFolder, String splittedRootPackage,
+			List<String> list) {
+
+		if (rootFolder.endsWith(splittedRootPackage))
+			return true;
+
+		File rootFolderFile = new File(rootFolder);
+
+		if (rootFolderFile.isDirectory() && !rootFolderFile.getName().startsWith(".")) {
+			for (File f : rootFolderFile.listFiles()) {
+				if (getFoldersContainingRootPackage(f.getAbsolutePath(), splittedRootPackage, list)) {
+					list.add(rootFolderFile.getAbsolutePath());
+					return false;
+				}
+			}
+		}
+		return false;
+
+	}
+
+	public void dumpProperties(OutputStream os) {
 		try {
 			properties.store(os, null);
 		} catch (IOException e) {
@@ -148,7 +180,7 @@ public class SystemConfiguration {
 		return repPath;
 	}
 
-	public String getSrcPath() {
+	public String getApiSrcPath() {
 		return srcPath;
 	}
 
@@ -170,7 +202,7 @@ public class SystemConfiguration {
 
 	public APIModel getModel() {
 
-		if(model == null){
+		if (model == null) {
 			try {
 
 				model = (APIModel) getModelClass().newInstance();
@@ -178,14 +210,14 @@ public class SystemConfiguration {
 				System.err.println("Error getting model from SystemConfiguration");
 				e.printStackTrace();
 			}
-		}	
+		}
 		return model;
 	}
 
 	public Class<? extends APIModel> getModelClass() {
-		if(modelClass == null ){
+		if (modelClass == null) {
 			try {
-				modelClass =  Class.forName(properties.getProperty(MODEL_CLASS_KEY)).asSubclass(APIModel.class);
+				modelClass = Class.forName(properties.getProperty(MODEL_CLASS_KEY)).asSubclass(APIModel.class);
 			} catch (ClassNotFoundException e) {
 				System.err.println("Error getting model class from SystemConfiguration");
 				e.printStackTrace();
@@ -195,8 +227,8 @@ public class SystemConfiguration {
 	}
 
 	public IAnalyzer getAnalyzer() {
-		if(analyzer == null)
-			analyzer= loadAnalyzerFromFile();
+		if (analyzer == null)
+			analyzer = loadAnalyzerFromFile();
 		return analyzer;
 	}
 
@@ -209,7 +241,7 @@ public class SystemConfiguration {
 	public void showSystemConfiguration() {
 		System.out.println("-----CONFIGURATION-----");
 		System.out.println("Repository path: " + getRepPath());
-		System.out.println("Source path: " + getSrcPath());
+		System.out.println("Source path: " + getApiSrcPath());
 		System.out.println("Library root package: " + getLibRootPackage());
 		System.out.println("Output file name: " + getOutputFileName());
 		System.out.println("Model file path: " + getModelFileName());
@@ -217,20 +249,17 @@ public class SystemConfiguration {
 		System.out.println("Parameters: " + getModelParameters());
 	}
 
-
-
 	public String getOutputFolder() {
 		File f = new File(outputFolderName);
-		if(!f.exists())
+		if (!f.exists())
 			f.mkdir();
 		return outputFolderName + File.separator;
 	}
 
-
 	public String getResourceFolder() throws FileNotFoundException {
-		if(resourcesFolderName != ""){
+		if (resourcesFolderName != "") {
 			File f = new File(resourcesFolderName);
-			if(!f.exists())
+			if (!f.exists())
 				throw new FileNotFoundException("The input folder specified was not found");
 		}
 		return resourcesFolderName + File.separator;
@@ -253,7 +282,5 @@ public class SystemConfiguration {
 		}
 		return analyzer;
 	}
-
-
 
 }
