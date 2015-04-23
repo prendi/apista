@@ -25,28 +25,27 @@ import pt.iscte.apista.ngram.interfaces.IInstructionTable;
 public class NGramModel implements APIModel, Serializable {
 
 	private int n;
-	
+
 	private UnigramTable unigramTable;
 	private IInstructionTable instructionTable = new NgramTable();
 
-	
 	@Override
 	public void setup(Parameters params) {
 		n = params.getIntValue("n");
 	}
-	
+
 	@Override
 	public void build(IAnalyzer analyzer) {
-		
+
 		unigramTable = new UnigramTable(analyzer);
-		
+
 		Parameters params = new Parameters();
-		params.addParameter("n", ""+n);
-		
+		params.addParameter("n", "" + n);
+
 		instructionTable.setup(params);
-		
+
 		instructionTable.buildTable(analyzer, unigramTable);
-		
+
 		instructionTable.calculateFrequency();
 	}
 
@@ -61,25 +60,21 @@ public class NGramModel implements APIModel, Serializable {
 		oos.close();
 	}
 
-	@SuppressWarnings("unchecked")
+
 	@Override
-	public void load(File file) throws IOException {
-		InputStream input = new FileInputStream(file);
-		ObjectInputStream ois = new ObjectInputStream(input);
+	public void load(InputStream stream) throws IOException {
+		ObjectInputStream ois = new ObjectInputStream(stream);
 		try {
-			instructionTable = (IInstructionTable) ois
-					.readObject();
-			
+			instructionTable = (IInstructionTable) ois.readObject();
 			unigramTable = (UnigramTable) ois.readObject();
-		} catch (ClassNotFoundException e) {
-			System.out
-					.println("Error loading file on NGramModel class");
-		}finally{
+		} 
+		catch (ClassNotFoundException e) {
+			System.out.println("Error loading file on NGramModel class");
+		} finally {
 			ois.close();
 		}
 
 	}
-	
 
 	@Override
 	public List<Instruction> query(List<Instruction> context, int max) {
@@ -91,14 +86,12 @@ public class NGramModel implements APIModel, Serializable {
 	@Override
 	public double probability(Instruction instruction, List<Instruction> context) {
 		NGramSentence ngs = new NGramSentence(n, context, unigramTable);
-		
-		if(unigramTable.isRare(instruction))
+
+		if (unigramTable.isRare(instruction))
 			instruction = Instruction.UNK;
-		
+
 		double prob = instructionTable.probability(instruction, ngs.tail());
-		
 		return prob == 0.0 ? unigramTable.rareFrequency() : prob;
-		
 	}
 
 }

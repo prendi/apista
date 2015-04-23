@@ -71,9 +71,8 @@ public class StupidBackoffNGramModel implements APIModel, Serializable {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void load(File file) throws IOException {
-		InputStream input = new FileInputStream(file);
-		ObjectInputStream ois = new ObjectInputStream(input);
+	public void load(InputStream stream) throws IOException {
+		ObjectInputStream ois = new ObjectInputStream(stream);
 		try {
 			models = (List<IInstructionTable>) ois.readObject();
 			unigramTable = (UnigramTable) ois.readObject();
