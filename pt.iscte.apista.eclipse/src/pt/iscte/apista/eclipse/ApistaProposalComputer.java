@@ -118,7 +118,7 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 			e.printStackTrace();
 		}
 		apiModel.setup(configuration.getModelParameters());
-		this.libSrcRoot = configuration.getSrcPath();
+		this.libSrcRoot = configuration.getApiSrcPath();
 
 		try {
 			apiModel.load(new File(configuration.getModelFileName()));

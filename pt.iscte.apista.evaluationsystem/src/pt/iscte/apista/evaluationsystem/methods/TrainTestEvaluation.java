@@ -104,7 +104,7 @@ public class TrainTestEvaluation extends AEvaluationMethod {
 		try {
 			bw = new BufferedWriter(new FileWriter(dataFile));
 			bw.write("sep=,"+ "\n");
-			bw.write("Index, Number Of Proposals, Cover Percentage, Comulative Percentage \n");
+			bw.write("Index, Number Of Proposals, Cover Percentage, Cumulative Percentage \n");
 
 			for (int i = 0; i != data.getMaxProposals(); i++) {
 				bw.write("" + (i + 1));

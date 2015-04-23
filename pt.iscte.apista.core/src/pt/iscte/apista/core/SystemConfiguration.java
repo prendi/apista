@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import pt.iscte.apista.core.Parametrizable.Parameters;
@@ -55,6 +57,7 @@ public class SystemConfiguration {
 	private Class<? extends APIModel> modelClass;
 	private int maxProposals;
 	private IAnalyzer analyzer;
+	private String apiSrcPath[];
 	
 	public SystemConfiguration() {
 		this(PROPERTIES_FILE_PATH);
@@ -93,6 +96,9 @@ public class SystemConfiguration {
 			dumpProperties(new FileOutputStream(new File(getOutputFolder() + "config.properties")));
 			dumpProperties(System.out);
 			
+			apiSrcPath = getSourcePathsFromRootFolder(srcPath, libRootPackage);
+			System.out.println(apiSrcPath);
+			
 		} catch (IOException e) {
 			System.err
 					.println("Problem loading the system properties on PropertiesHolder");
@@ -100,6 +106,36 @@ public class SystemConfiguration {
 		}
 		
 	}
+	
+	private static String[] getSourcePathsFromRootFolder(String rootFolder, String rootPackage){
+		ArrayList<String> list = new ArrayList<>();
+		getFoldersContainingRootPackage(rootFolder, rootPackage.split("\\.")[0], list);
+		
+		if(list.size() == 0)
+			throw new IllegalArgumentException("The root package " + rootPackage + " was not found in this directory");
+			
+		return list.toArray(new String[list.size()]);
+	}
+	
+	private static boolean getFoldersContainingRootPackage(String rootFolder, String splittedRootPackage, List<String> list){
+		
+		if(rootFolder.endsWith(splittedRootPackage))
+			return true;
+		
+		File rootFolderFile = new File(rootFolder);
+		
+		if(rootFolderFile.isDirectory() && !rootFolderFile.getName().startsWith(".")){
+			for(File f : rootFolderFile.listFiles()){
+				if(getFoldersContainingRootPackage(f.getAbsolutePath(), splittedRootPackage, list)){
+					list.add(rootFolderFile.getAbsolutePath());
+					return false;
+				}
+			}
+		}
+		return false;
+		
+	}
+	
 	
 	public void dumpProperties(OutputStream os){
 		try {
@@ -146,7 +182,7 @@ public class SystemConfiguration {
 		return repPath;
 	}
 
-	public String getSrcPath() {
+	public String getApiSrcPath() {
 		return srcPath;
 	}
 
@@ -207,7 +243,7 @@ public class SystemConfiguration {
 	public void showSystemConfiguration() {
 		System.out.println("-----CONFIGURATION-----");
 		System.out.println("Repository path: " + getRepPath());
-		System.out.println("Source path: " + getSrcPath());
+		System.out.println("Source path: " + getApiSrcPath());
 		System.out.println("Library root package: " + getLibRootPackage());
 		System.out.println("Output file name: " + getOutputFileName());
 		System.out.println("Model file path: " + getModelFileName());

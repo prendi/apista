@@ -32,7 +32,7 @@ public class CrossValidation extends ACrossEvaluationMethod {
 
 			bw = new BufferedWriter(new FileWriter(dataFile));
 			bw.write("sep=,"+ "\n");
-			bw.write("Index, Average Number Of Proposals, Average Cover Percentage, Average Comulative Percentage Cover \n");
+			bw.write("Index, Average Number Of Proposals, Average Cover Percentage, Average Cumulative Percentage Cover \n");
 			
 			
 			for (EvaluationData data : dataList) {

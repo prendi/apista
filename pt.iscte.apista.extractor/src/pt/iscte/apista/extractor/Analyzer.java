@@ -114,9 +114,6 @@ public class Analyzer implements IAnalyzer, Serializable {
 		time = (System.currentTimeMillis() - t) / 1000;
 	}
 
-
-
-
 	public long getTime() {
 		return time;
 	}
@@ -180,26 +177,6 @@ public class Analyzer implements IAnalyzer, Serializable {
 	}
 
 	private String filePath;
-	//	private void parse(File file, String libSrc) {
-	//		
-	//		if (file.isFile() && file.getName().endsWith(".java")) {
-	//			filePath = file.getAbsolutePath();
-	//			
-	//			JavaSourceParser parser = JavaSourceParser.createFromFile(
-	//					filePath, libSrc, "UTF-8");
-	//		
-	//			BlockVisitorV3 v = new BlockVisitorV3(this);
-	//			try{
-	//				parser.parse(v);
-	//			}catch(Exception e ){
-	//				System.out.println("ERROR ON FILE: " + file.getAbsolutePath());
-	//			}
-	//			nFiles++;
-	//		} else if (file.isDirectory() && !file.getName().startsWith(".")) {
-	//			for (File c : file.listFiles())
-	//				parse(c, libSrc);
-	//		}
-	//	}
 
 	private void parse(File file, String libSrc) {
 
@@ -232,7 +209,7 @@ public class Analyzer implements IAnalyzer, Serializable {
 	@Override
 	public void run(SystemConfiguration configuration) {
 
-		run(configuration.getLibRootPackage(), configuration.getRepPath(), configuration.getSrcPath());
+		run(configuration.getLibRootPackage(), configuration.getRepPath(), configuration.getApiSrcPath());
 
 	}
 
