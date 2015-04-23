@@ -22,5 +22,4 @@ public class ModelBuilder {
 		model.save(output);
 
 	}
-
 }

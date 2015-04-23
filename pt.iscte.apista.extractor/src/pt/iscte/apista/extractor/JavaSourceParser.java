@@ -37,8 +37,6 @@ public class JavaSourceParser {
 		
 		return new JavaSourceParser(readFileToString(source), getClassName(source), new String[]{jarFilePath}, null, null);
 	}
-	
-	
 
 	private static void validateFilePath(String filePath) {
 		File f = new File(filePath);

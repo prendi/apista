@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="api" name="API model" schema="schema/api.exsd"/>
        <extension point="org.eclipse.jdt.ui.javaCompletionProposalSorters">
       <proposalSorter
             class="pt.iscte.apista.eclipse.ApistaSorter"
@@ -8,4 +9,22 @@
             name="APISTA">
       </proposalSorter>
    </extension>
+       <extension
+             id="apista"
+             name="APISTA"
+             point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+          <javaCompletionProposalComputer
+                activate="true"
+                categoryId="pt.iscte.apista.eclipse.apista-cat"
+                class="pt.iscte.apista.eclipse.ApistaProposalComputer"
+                needsSortingAfterFiltering="false">
+          </javaCompletionProposalComputer>
+       </extension>
+       <extension
+             id="apista-cat"
+             name="API Sentence Token Proposals (APISTA)"
+             point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+          <proposalCategory
+                icon="tnames_co.gif"></proposalCategory>
+       </extension>
    </plugin>

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.util.EnumMap;
 import java.util.Properties;
 
 import pt.iscte.apista.core.Parametrizable.Parameters;
@@ -40,6 +41,7 @@ public class SystemConfiguration {
 	private static final String OUTPUT_FOLDER_KEY = "outputFolder";
 	//Folder to input all the data (Model, Analyzer)
 	private static final String RESOURCE_INPUT_FOLDER_KEY = "resourceFolder";
+
 	
 	private String outputFileName;
 	private String modelFilename;
@@ -55,21 +57,27 @@ public class SystemConfiguration {
 	private Class<? extends APIModel> modelClass;
 	private int maxProposals;
 	private IAnalyzer analyzer;
-	
+
 	public SystemConfiguration() {
 		this(PROPERTIES_FILE_PATH);
 	}
 
-	public SystemConfiguration(String propertiesPath){
+	public SystemConfiguration(String propertiesPath) {
 		try {
-			// Load properties from file
-			properties = new Properties();
-			InputStream input;
+			loadFromInputStream(new FileInputStream(propertiesPath));
+		} catch (FileNotFoundException e) {
+			System.err.println("File not found: " + propertiesPath);
+		}
+	}
 
-			input = new FileInputStream(propertiesPath);
+	public SystemConfiguration(InputStream stream) {
+		loadFromInputStream(stream);
+	}
 
-			properties.load(input);
-			input.close();
+	private void loadFromInputStream(InputStream stream) {
+		properties = new Properties();
+		try {
+			properties.load(stream);
 
 			modelFilename = properties.getProperty(MODEL_FILE_KEY);
 			outputFileName = properties.getProperty(OUTPUT_FILE_NAME_KEY);
@@ -77,11 +85,11 @@ public class SystemConfiguration {
 
 			outputFolderName = properties.getProperty(OUTPUT_FOLDER_KEY);
 			resourcesFolderName = properties.getProperty(RESOURCE_INPUT_FOLDER_KEY);
-			
+
 			repPath = properties.getProperty(REP_PATH_KEY);
 			srcPath = properties.getProperty(SRC_PATH_KEY);
 			libRootPackage = properties.getProperty(LIB_ROOT_PACKAGE_KEY);
-			
+
 			maxProposals = Integer.parseInt(properties
 					.getProperty(MAX_PROPOSALS_KEY));
 
@@ -89,18 +97,12 @@ public class SystemConfiguration {
 					.getProperty(PARAMETERS_KEY));
 
 			modelParameters = convertRawParameters(rawParameters);
-			
-			dumpProperties(new FileOutputStream(new File(getOutputFolder() + "config.properties")));
-			dumpProperties(System.out);
-			
-		} catch (IOException e) {
-			System.err
-					.println("Problem loading the system properties on PropertiesHolder");
+		}
+		catch(IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
-	
+
 	public void dumpProperties(OutputStream os){
 		try {
 			properties.store(os, null);
@@ -109,7 +111,7 @@ public class SystemConfiguration {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Converts the parameters string into an array of Param
 	 * 
@@ -167,10 +169,10 @@ public class SystemConfiguration {
 	}
 
 	public APIModel getModel() {
-		
+
 		if(model == null){
 			try {
-				
+
 				model = (APIModel) getModelClass().newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				System.err.println("Error getting model from SystemConfiguration");
@@ -216,15 +218,15 @@ public class SystemConfiguration {
 	}
 
 
-	
+
 	public String getOutputFolder() {
 		File f = new File(outputFolderName);
 		if(!f.exists())
 			f.mkdir();
 		return outputFolderName + File.separator;
 	}
-	
-	
+
+
 	public String getResourceFolder() throws FileNotFoundException {
 		if(resourcesFolderName != ""){
 			File f = new File(resourcesFolderName);
@@ -233,7 +235,7 @@ public class SystemConfiguration {
 		}
 		return resourcesFolderName + File.separator;
 	}
-	
+
 	public IAnalyzer loadAnalyzerFromFile() {
 
 		FileInputStream fis;
@@ -242,7 +244,7 @@ public class SystemConfiguration {
 			System.out.println(getResourceFolder() + analyzerFilename);
 			fis = new FileInputStream(new File(getResourceFolder() + analyzerFilename));
 			ObjectInputStream ois = new ObjectInputStream(fis);
-			
+
 			analyzer = (IAnalyzer) ois.readObject();
 			ois.close();
 		} catch (IOException | ClassNotFoundException e) {
@@ -252,6 +254,6 @@ public class SystemConfiguration {
 		return analyzer;
 	}
 
-	
+
 
 }

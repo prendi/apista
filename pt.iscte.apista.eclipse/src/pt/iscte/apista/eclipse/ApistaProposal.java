@@ -59,12 +59,12 @@ public class ApistaProposal implements ICompletionProposal {
 	@Override
 	public void apply(IDocument document) {
 		try {
+			// TODO return type import
 			if(!visitor.getExistingImports().contains(instruction.getQualifiedTypeName())) {
 				String importStatement = "import " + instruction.getQualifiedTypeName() + ";\n";
 				document.replace(0, 0, importStatement);
 				offset = importStatement.length();
 			}
-			
 			document.replace(context.getInvocationOffset() + offset, 0, code);
 		} catch (BadLocationException e) {
 			e.printStackTrace();
@@ -91,6 +91,9 @@ public class ApistaProposal implements ICompletionProposal {
 	public IContextInformation getContextInformation() {
 		return information;
 	}
+	
+	
+	
 	
 	private String extractDocumentation(IMember member) {
 		try {

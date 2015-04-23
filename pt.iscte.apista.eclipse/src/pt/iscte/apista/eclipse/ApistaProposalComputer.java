@@ -1,7 +1,7 @@
 package pt.iscte.apista.eclipse;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -30,6 +32,9 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
+
+import com.google.common.collect.Lists;
 
 import pt.iscte.apista.core.APIModel;
 import pt.iscte.apista.core.ITypeCache;
@@ -40,30 +45,87 @@ import pt.iscte.apista.core.SystemConfiguration;
 import pt.iscte.apista.extractor.BlockVisitorV3;
 import pt.iscte.apista.extractor.JavaSourceParser;
 
-import com.google.common.collect.Lists;
 
+public class ApistaProposalComputer implements IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 
-public abstract class ApistaProposalComputer implements
-IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
+	public static final String EXT_POINT_ID = "pt.iscte.apista.eclipse.api";
 
-	@Override
-	public void sessionStarted() {
-
-	}
-
-	@Override
-	public String getErrorMessage() {
-		return null;
-	}
-
-	@Override
-	public void sessionEnded() {
-
-	}
-	
 	private Map<String, IType> typeCache = new HashMap<String, IType>();
+
 	private Map<IType, ITypeHierarchy> cache = new HashMap<IType, ITypeHierarchy>();
 	
+	private 
+	//TODO: tmp
+	static APIModel apiModel;
+	static String libSrcRoot;
+
+	private class Model {
+		final APIModel model;
+		final String lib
+		final Image icon;
+	}
+	
+	private List<E>
+	private Map<APIModel,Image> icons;
+	
+	
+	private IJavaProject project;
+
+	public ApistaProposalComputer() {
+		IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(EXT_POINT_ID);
+		for(IExtension ext : extensionPoint.getExtensions()) {
+			IConfigurationElement[] configurationElements = ext.getConfigurationElements();
+			APIModel model = null;
+			for(IConfigurationElement api : configurationElements)
+				try {
+
+					Bundle bundle = Platform.getBundle(ext.getContributor().getName());
+					URL fileURL = bundle.getEntry(api.getAttribute("configuration"));
+					
+					InputStream inputStream = fileURL.openConnection().getInputStream();
+					SystemConfiguration conf = new SystemConfiguration(inputStream);
+					libSrcRoot = conf.getSrcPath();
+					model = (APIModel) api.createExecutableExtension("model");
+					apiModel = model;
+					apiModel.setup(conf.getModelParameters());
+					
+					URL modelFileURL = bundle.getEntry(api.getAttribute("modelFile"));
+					
+					InputStream modelInputStream = modelFileURL.openConnection().getInputStream();
+					apiModel.load(modelInputStream);
+				} 
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			System.out.println(model);
+		}
+	}
+	
+	
+	
+	public ApistaProposalComputer(Class<? extends APIModel> modelClass, SystemConfiguration configuration) {
+
+		try {
+			apiModel = modelClass.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		apiModel.setup(configuration.getModelParameters());
+		libSrcRoot = configuration.getSrcPath();
+
+//		try {
+//			apiModel.load(new File(configuration.getModelFileName()));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+
+		//loadIcon(modelClass);
+		ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin("pt.iscte.apista.eclipse", "swt.gif");
+		icon = desc.createImage();
+	}
+
+
 	@Override
 	public IType getType(String qualifiedName) {
 		if(project == null)
@@ -71,7 +133,7 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 		else {
 			if(typeCache.containsKey(qualifiedName))
 				return typeCache.get(qualifiedName);
-			
+
 			IType t = null;
 			try {
 				t = project.findType(qualifiedName, new NullProgressMonitor());
@@ -80,12 +142,12 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 			}
 			if(t == null)
 				return null;
-			
+
 			typeCache.put(qualifiedName, t);
 			return t;
 		}
 	}
-	
+
 	@Override
 	public ITypeHierarchy getTypeHierarchy(IType type) {
 		if(cache.containsKey(type))
@@ -104,32 +166,6 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 		}
 	}
 
-	//TODO: tmp
-	static APIModel apiModel;
-	static String libSrcRoot;
-
-	Image icon;
-	IJavaProject project;
-	
-	public ApistaProposalComputer(Class<? extends APIModel> modelClass, SystemConfiguration configuration) {
-		try {
-			apiModel = modelClass.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		apiModel.setup(configuration.getModelParameters());
-		this.libSrcRoot = configuration.getSrcPath();
-
-		try {
-			apiModel.load(new File(configuration.getModelFileName()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		//loadIcon(modelClass);
-		ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin("pt.iscte.apista.eclipse", "swt.gif");
-		icon = desc.createImage();
-	}
 
 	private void loadIcon(Class<? extends APIModel> modelClass) {
 		IExtension[] exts = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.jdt.ui.javaCompletionProposalComputer").getExtensions();
@@ -175,11 +211,8 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 		IDocument document = context.getDocument();
 
 		int line = getLineNumber(context);
-
 		String lineContent = getLineContent(document, line);
-
 		BlockVisitorV3 visitor = new BlockVisitorV3(line);
-
 		int offset = context.getInvocationOffset() - lineContent.length();
 		String src = document.get().substring(0, offset).concat(document.get().substring(context.getInvocationOffset()));
 
@@ -193,19 +226,19 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 		if(lineContent.isEmpty()) {
 
 			List<Instruction> blockContext = new ArrayList<Instruction>();
-			List<Sentence> blockSentences = visitor.getAnalyzer().getSentences();
-			
-//			Sentence last = blockSentences.get(blockSentences.size()-1);
-			
+			//			List<Sentence> blockSentences = visitor.getAnalyzer().getSentences();
+
+			//			Sentence last = blockSentences.get(blockSentences.size()-1);
+
 			for(Sentence s : visitor.getAnalyzer().getSentences())
 				blockContext.addAll(s.getInstructions());
 
 			blockContext = Collections.unmodifiableList(blockContext);
-			
+
 			System.out.println("Context:  " + Arrays.toString(blockContext.toArray()));
 
 			Map<String, IType> vars = convert(visitor.getExistingVariables(), project);
-			
+
 			List<Instruction> proposals = apiModel.query(blockContext, 20);
 			for(Instruction instruction : proposals) {
 				if(instruction instanceof MethodInstruction) { // !isStatic
@@ -213,7 +246,7 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 					if(!vars.containsValue(t))
 						continue;
 				}
-					
+
 				list.add(new ApistaProposal(context, this, instruction, visitor, vars, this));
 			}
 		}
@@ -224,28 +257,14 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 	private Map<String, IType> convert(Map<String, String> existingVariables, IJavaProject project) {
 		Map<String, IType> map = new LinkedHashMap<String, IType>();
 		List<Entry<String, String>> list = new ArrayList<Map.Entry<String,String>>(existingVariables.entrySet());
-		
+
 		for(Entry<String, String> e : Lists.reverse(list)) {
 			map.put(e.getKey(), getType(e.getValue()));
 		}
 
-//		for(Entry<String, String> e : existingVariables.entrySet())
-//			map.put(e.getKey(), getType(e.getValue()));
 		return map;
 	}
 
-	//	private void filterNonDependent(List<Instruction> block) {
-	//		int last = block.size()-1;
-	//		Instruction inst = block.get(last);
-	//		Iterator<Instruction> it = block.iterator();
-	//		while(it.hasNext()) {
-	//			Instruction n = it.next();
-	//			if(n == inst)
-	//				break;
-	//			if(!inst.dependsOn(n))
-	//				it.remove();
-	//		}
-	//	}
 
 	private int getLineNumber(ContentAssistInvocationContext context) {
 		try {
@@ -293,5 +312,20 @@ IJavaCompletionProposalComputer, IContextInformation, ITypeCache {
 		return icon;
 	}
 
+
+	@Override
+	public void sessionStarted() {
+
+	}
+
+	@Override
+	public String getErrorMessage() {
+		return null;
+	}
+
+	@Override
+	public void sessionEnded() {
+
+	}
 
 }

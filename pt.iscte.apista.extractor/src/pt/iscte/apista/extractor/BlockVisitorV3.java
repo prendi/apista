@@ -57,6 +57,8 @@ public class BlockVisitorV3 extends ASTVisitor{
 	
 	private int blockLine = -1;
 	
+	private int currentLine = - 1;
+	
 	public BlockVisitorV3(Analyzer analizer) {
 		this(analizer, analizer.getPackageRoot());
 	}
@@ -106,8 +108,31 @@ public class BlockVisitorV3 extends ASTVisitor{
 	}
 	
 	@Override
+	public void preVisit(ASTNode node) {
+		currentLine = getLineNumber(node);
+		if(withinRange(node) && isNestedStatement(node)){
+			conditionalNesting++;
+		}
+		if(node instanceof EnhancedForStatement){
+			SimpleName nodeName = ((EnhancedForStatement) node).getParameter().getName();
+			if(includePackage(nodeName.resolveTypeBinding()))
+				varMap.put(nodeName.getIdentifier(), ((EnhancedForStatement) node).getExpression());
+		}
+	}
+	
+	private boolean includePackage(ITypeBinding typeBinding) {
+		if(typeBinding!=null){
+			IPackageBinding packageBinding = typeBinding.getPackage();
+			if(packageBinding == null)
+				return false;
+
+			return packageBinding.getName().startsWith(packageRoot);
+		}
+		return false;
+	}
+	
+	@Override
 	public boolean visit(Block node){
-		// ideia: parametros como features
 		boolean visit = 
 				node.getParent() instanceof MethodDeclaration || withinRange(node)
 				&& (node.getParent() instanceof DoStatement || isNestedStatement(node.getParent()))
@@ -212,16 +237,7 @@ public class BlockVisitorV3 extends ASTVisitor{
 				|| node instanceof EnhancedForStatement;
 	}
 	
-	private boolean includePackage(ITypeBinding typeBinding) {
-		if(typeBinding!=null){
-			IPackageBinding packageBinding = typeBinding.getPackage();
-			if(packageBinding == null)
-				return false;
-
-			return packageBinding.getName().startsWith(packageRoot);
-		}
-		return false;
-	}
+	
 	
 	@Override
 	public boolean visit(ImportDeclaration node) {
@@ -392,16 +408,10 @@ public class BlockVisitorV3 extends ASTVisitor{
 		
 	}
 	
-	@Override
-	public void preVisit(ASTNode node) {
-		if(withinRange(node) && isNestedStatement(node)){
-			conditionalNesting++;
-		}
-		if(node instanceof EnhancedForStatement){
-			SimpleName nodeName = ((EnhancedForStatement) node).getParameter().getName();
-			if(includePackage(nodeName.resolveTypeBinding()))
-				varMap.put(nodeName.getIdentifier(), ((EnhancedForStatement) node).getExpression());
-		}
+	
+	
+	public int getCurrentLine() {
+		return currentLine;
 	}
 	
 	@Override

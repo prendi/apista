@@ -2,6 +2,7 @@ package pt.iscte.apista.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public interface APIModel extends Parametrizable{
@@ -19,7 +20,7 @@ public interface APIModel extends Parametrizable{
 	/**
 	 * Loads the model from the file
 	 */
-	void load(File file) throws IOException;
+	void load(InputStream file) throws IOException;
 
 	/**
 	 * Return a list of instruction proposals (with max size), given the list of previous instructions (context)

@@ -208,13 +208,13 @@ public class Analyzer implements IAnalyzer, Serializable {
 
 //			JavaSourceParser parser = JavaSourceParser.createFromJar(
 //					filePath, libSrc);
-						JavaSourceParser parser = JavaSourceParser.createFromFile(filePath, libSrc, "UTF-8");
+			JavaSourceParser parser = JavaSourceParser.createFromFile(filePath, libSrc, "UTF-8");
 
 			BlockVisitorV3 v = new BlockVisitorV3(this);
 			try{
 				parser.parse(v);
-			}catch(Exception e ){
-				System.out.println("ERROR ON FILE: " + file.getAbsolutePath());
+			}catch(Exception e){
+				System.out.println("ERROR ON FILE: " + file.getAbsolutePath() + ":" + v.getCurrentLine());
 				e.printStackTrace();
 			}
 			nFiles++;
