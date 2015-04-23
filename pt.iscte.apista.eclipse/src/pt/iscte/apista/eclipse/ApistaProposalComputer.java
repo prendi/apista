@@ -53,47 +53,69 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 	private Map<String, IType> typeCache = new HashMap<String, IType>();
 
 	private Map<IType, ITypeHierarchy> cache = new HashMap<IType, ITypeHierarchy>();
-	
-	//TODO: tmp
-	static APIModel apiModel;
-	static String libSrcRoot;
 
-	private Map<APIModel,Image> icons;
-	
-	
+	private String[] sourcePaths;
+	private Map<APIModel,Image> models;
+
+	private Image defaultIcon;
+
 	private IJavaProject project;
 
+	private static ApistaProposalComputer _instance;
+
+	public static ApistaProposalComputer getInstance() {
+		return _instance;
+	}
+
 	public ApistaProposalComputer() {
+		_instance = this;
+		{
+			ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin("pt.iscte.apista.eclipse", "tnames_co.gif");
+			defaultIcon = desc.createImage();
+		}
+
 		IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(EXT_POINT_ID);
-		for(IExtension ext : extensionPoint.getExtensions()) {
+		IExtension[] extensions = extensionPoint.getExtensions();
+
+		models = new HashMap<>();
+
+		List<String> sourcePathsList = new ArrayList<>();
+
+		for(IExtension ext : extensions) {
 			IConfigurationElement[] configurationElements = ext.getConfigurationElements();
-			APIModel model = null;
 			for(IConfigurationElement api : configurationElements)
 				try {
-
-					Bundle bundle = Platform.getBundle(ext.getContributor().getName());
+					String pluginId = ext.getContributor().getName();
+					Bundle bundle = Platform.getBundle(pluginId);
 					URL fileURL = bundle.getEntry(api.getAttribute("configuration"));
-					
+
 					InputStream inputStream = fileURL.openConnection().getInputStream();
-					SystemConfiguration conf = new SystemConfiguration(inputStream);
-					libSrcRoot = conf.getApiSrcPath();
-					model = (APIModel) api.createExecutableExtension("model");
-					apiModel = model;
-					apiModel.setup(conf.getModelParameters());
-					
+					SystemConfiguration conf = new SystemConfiguration(inputStream);	
+
+					for(String p : conf.getApiSrcPath())
+						sourcePathsList.add(p);
+
 					URL modelFileURL = bundle.getEntry(api.getAttribute("modelFile"));
-					
 					InputStream modelInputStream = modelFileURL.openConnection().getInputStream();
-					apiModel.load(modelInputStream);
+
+					APIModel model = (APIModel) api.createExecutableExtension("model");
+					model.setup(conf.getModelParameters());
+					model.load(modelInputStream);
+
+					String iconFile = api.getAttribute("icon");
+					Image icon = null;
+					if(!iconFile.isEmpty()) {
+						ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, iconFile);
+						icon = desc.createImage();
+					}
+					models.put(model, icon);
 				} 
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-			System.out.println(model);
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		ImageDescriptor desc = AbstractUIPlugin.imageDescriptorFromPlugin("pt.iscte.apista.eclipse", "swt.gif");
-		Image icon = desc.createImage();
+		sourcePaths = sourcePathsList.toArray(new String[sourcePathsList.size()]);
 	}
 
 
@@ -137,7 +159,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 		}
 	}
 
-	
+
 
 
 	@Override
@@ -156,7 +178,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 			e.printStackTrace();
 		}
 
-		List<ICompletionProposal> list = new ArrayList<>();
+
 		IDocument document = context.getDocument();
 
 		int line = getLineNumber(context);
@@ -166,18 +188,17 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 		String src = document.get().substring(0, offset).concat(document.get().substring(context.getInvocationOffset()));
 
 		//TODO remove hard-coded "Test"
-		JavaSourceParser parser = JavaSourceParser.createFromSource(src, "Test", libSrcRoot, "UTF-8");
+		JavaSourceParser parser = JavaSourceParser.createFromSource(src, "Test", sourcePaths, "UTF-8");
 		parser.parse(visitor);
 
 		System.out.println(visitor.getExistingVariables());
 
+
+		List<ICompletionProposal> list = new ArrayList<>();
 		// adds if line has no text
 		if(lineContent.isEmpty()) {
 
 			List<Instruction> blockContext = new ArrayList<Instruction>();
-			//			List<Sentence> blockSentences = visitor.getAnalyzer().getSentences();
-
-			//			Sentence last = blockSentences.get(blockSentences.size()-1);
 
 			for(Sentence s : visitor.getAnalyzer().getSentences())
 				blockContext.addAll(s.getInstructions());
@@ -188,20 +209,29 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 
 			Map<String, IType> vars = convert(visitor.getExistingVariables(), project);
 
-			List<Instruction> proposals = apiModel.query(blockContext, 20);
-			for(Instruction instruction : proposals) {
-				if(instruction instanceof MethodInstruction) { // !isStatic
-					IType t = getType(instruction.getQualifiedTypeName());
-					if(!vars.containsValue(t))
-						continue;
+			for(APIModel model : models.keySet()) {
+				List<Instruction> proposals = model.query(blockContext, 20);
+				for(Instruction instruction : proposals) {
+					if(instruction instanceof MethodInstruction) { // !isStatic
+						IType t = getType(instruction.getQualifiedTypeName());
+						if(!vars.containsValue(t))
+							continue;
+					}
+					list.add(new ApistaProposal(context, this, instruction, visitor, vars, this, models.get(model)));	
 				}
-
-				list.add(new ApistaProposal(context, this, instruction, visitor, vars, this));
 			}
+
 		}
 		return list;
 	}
 
+
+	List<Instruction> query(List<Instruction> blockContext) {
+		List<Instruction> proposals = new ArrayList<>();
+		for(APIModel model : models.keySet())
+			proposals.addAll(model.query(blockContext, 20));
+		return proposals;
+	}
 
 	private Map<String, IType> convert(Map<String, String> existingVariables, IJavaProject project) {
 		Map<String, IType> map = new LinkedHashMap<String, IType>();
@@ -236,6 +266,10 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 		return lineContent.trim();
 	}
 
+	String[] getSourcePaths() {
+		return sourcePaths;
+	}
+
 	@Override
 	public List<IContextInformation> computeContextInformation(
 			ContentAssistInvocationContext context, IProgressMonitor monitor) {
@@ -257,7 +291,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 
 	@Override
 	public Image getImage() {
-		return null;
+		return defaultIcon;
 	}
 
 
@@ -275,5 +309,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 	public void sessionEnded() {
 
 	}
+
+
 
 }

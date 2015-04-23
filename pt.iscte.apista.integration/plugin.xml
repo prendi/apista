@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
- <extension
-         id="org.eclipselabs.slapis.parser.swt.cat"
-         name="SWT Document Term Matrix"
-         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
-      <proposalCategory icon="swt.gif"></proposalCategory> 
-   </extension>
    
-   <extension id="swt"
-         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
-      <javaCompletionProposalComputer
-            activate="true"
-            categoryId="org.eclipselabs.slapis.parser.swt.cat"
-            class="pt.iscte.apista.integration.ProposalComputer"
-            needsSortingAfterFiltering="false">
-      </javaCompletionProposalComputer>
+   <extension
+         point="pt.iscte.apista.eclipse.api">
+      <api
+            configuration="config.properties"
+            icon="swt.gif"
+            model="pt.iscte.apista.ngram.models.NGramModel"
+            modelFile="swt.ngram"
+            name="SWT">
+      </api>
    </extension>
 </plugin>

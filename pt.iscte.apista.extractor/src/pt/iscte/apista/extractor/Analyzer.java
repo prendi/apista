@@ -107,7 +107,7 @@ public class Analyzer implements IAnalyzer, Serializable {
 
 	}
 
-	private void parse(String repositoryRoot, String libSrcRoot) {
+	private void parse(String repositoryRoot, String[] libSrcRoot) {
 		long t = System.currentTimeMillis();
 		nFiles = 0;
 		parse(new File(repositoryRoot), libSrcRoot);
@@ -178,7 +178,7 @@ public class Analyzer implements IAnalyzer, Serializable {
 
 	private String filePath;
 
-	private void parse(File file, String libSrc) {
+	private void parse(File file, String[] libSrc) {
 
 		if (file.isFile() && file.getName().endsWith(".java")) {
 			filePath = file.getAbsolutePath();
@@ -214,6 +214,10 @@ public class Analyzer implements IAnalyzer, Serializable {
 	}
 
 	public void run(String packageRoot, String repPath, String srcPath){
+		run(packageRoot, repPath, new String[] {srcPath});
+	}
+	
+	public void run(String packageRoot, String repPath, String[] srcPath){
 		this.packageRoot = packageRoot;
 		sentences = new ArrayList<>();
 		parse(repPath, srcPath);

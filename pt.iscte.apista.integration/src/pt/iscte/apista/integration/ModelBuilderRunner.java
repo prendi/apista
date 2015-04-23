@@ -7,13 +7,7 @@ public class ModelBuilderRunner {
 
 	public static void main(String[] args) throws Exception {
 
-		
-		
-//		Filter f = new Filter.Range(0, 0.7);
-
-		SystemConfiguration configuration = new SystemConfiguration(
-				"C:/Users/Gonçalo/Dropbox/Thesis/Code/pt.iscte.apista.evaluationsystem/resources/config.properties");
-
+		SystemConfiguration configuration = new SystemConfiguration("/Users/andresantos/git/apista/pt.iscte.apista.integration/config.properties");
 		ModelBuilder.run(configuration);
 	}
 }

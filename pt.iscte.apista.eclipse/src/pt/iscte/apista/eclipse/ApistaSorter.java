@@ -20,7 +20,6 @@ import pt.iscte.apista.extractor.JavaSourceParser;
 public class ApistaSorter extends AbstractProposalSorter {
 
 	private List<Instruction> blockContext;
-//	private List<Instruction> contextinfoblock;
 	private List<Instruction> proposals;
 	private String expectedType;
 
@@ -41,18 +40,20 @@ public class ApistaSorter extends AbstractProposalSorter {
 		ContextInfo contextInfo = new ContextInfo(line);
 		BlockVisitorV3 visitor = new BlockVisitorV3(line);
 
+		ApistaProposalComputer proposalComputer = ApistaProposalComputer.getInstance();
+
+		String[] srcPaths = proposalComputer.getSourcePaths();
+
 		// TODO remove hard-coded "Test"
-		JavaSourceParser parser = JavaSourceParser.createFromSource(src, "Test", ApistaProposalComputer.libSrcRoot,
-				"UTF-8");
+		JavaSourceParser parser = JavaSourceParser.createFromSource(src, "Test", srcPaths, "UTF-8");
 		parser.parse(visitor);
 
-		parser = JavaSourceParser.createFromSource(src, "Test", ApistaProposalComputer.libSrcRoot, "UTF-8");
-
+		parser = JavaSourceParser.createFromSource(src, "Test", srcPaths, "UTF-8");
 		parser.parse(contextInfo);
 
 		blockContext = visitor.getAnalyzer().getFirst().getInstructions();
 
-		proposals = ApistaProposalComputer.apiModel.query(blockContext, 0);
+		proposals = proposalComputer.query(blockContext);
 
 		if (lineContent.length() > 0) {
 			expectedType = contextInfo.varType(lineContent.replace(".", ""));
@@ -85,10 +86,7 @@ public class ApistaSorter extends AbstractProposalSorter {
 
 	@Override
 	public int compare(ICompletionProposal p1, ICompletionProposal p2) {
-
-		// System.out.println("P1: " + p1.getClass() + " P2: " + p2.getClass());
-
-		// pulls up Slapis proposals
+		// pulls up APISTA proposals
 		if (ApistaProposal.class.isInstance(p1) && !ApistaProposal.class.isInstance(p2))
 			return -1;
 		else if (!ApistaProposal.class.isInstance(p1) && ApistaProposal.class.isInstance(p2))
@@ -103,21 +101,12 @@ public class ApistaSorter extends AbstractProposalSorter {
 			if (m1 == null || m2 == null)
 				return 0;
 
-			// Signature.
-
 			MethodInstruction mi1 = new MethodInstruction(expectedType, m1.getElementName());
-			// double prob1 = SlapisProposalComputer.apiModel.probability(mi1,
-			// blockContext);
-
 			int indexI1 = proposals.indexOf(mi1);
 
 			MethodInstruction mi2 = new MethodInstruction(expectedType, m2.getElementName());
-			// double prob2 = SlapisProposalComputer.apiModel.probability(mi2,
-			// blockContext);
 			int indexI2 = proposals.indexOf(mi2);
 
-			// System.out.println("INST: " + mi1 + " index: " + indexI1
-			// + " INST2: " + mi2 + " index: " + indexI2);
 			if (indexI1 == -1 && indexI2 > -1) {
 				return 1;
 			} else if (indexI2 == -1 && indexI1 > -1) {

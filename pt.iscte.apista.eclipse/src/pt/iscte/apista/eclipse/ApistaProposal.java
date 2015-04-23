@@ -35,14 +35,18 @@ public class ApistaProposal implements ICompletionProposal {
 	private String display;
 	private IType type;
 	
+	private Image icon;
+	
 	private int offset = 0;
 	
 	public ApistaProposal(ContentAssistInvocationContext context, IContextInformation information, Instruction instruction, 
-			BlockVisitorV3 visitor, Map<String, IType> vars, ITypeCache typeCache) {
+			BlockVisitorV3 visitor, Map<String, IType> vars, ITypeCache typeCache, Image icon) {
 		this.context = context;
 		this.information = information;
 		this.instruction = instruction;
 		this.visitor = visitor;
+		this.icon = icon;
+		
 		type = typeCache.getType(instruction.getQualifiedTypeName());
 		code = instruction.resolveInstruction(type, vars, typeCache);
 		display = " " + (code.indexOf('=') != -1 ? code.substring(code.indexOf('=')+2) : code);
@@ -60,6 +64,7 @@ public class ApistaProposal implements ICompletionProposal {
 	public void apply(IDocument document) {
 		try {
 			// TODO return type import
+			// TODO BUG before package
 			if(!visitor.getExistingImports().contains(instruction.getQualifiedTypeName())) {
 				String importStatement = "import " + instruction.getQualifiedTypeName() + ";\n";
 				document.replace(0, 0, importStatement);
@@ -79,7 +84,7 @@ public class ApistaProposal implements ICompletionProposal {
 
 	@Override
 	public Image getImage() {
-		return information.getImage();
+		return icon == null ? information.getImage() : icon;
 	}
 
 	@Override
@@ -91,9 +96,6 @@ public class ApistaProposal implements ICompletionProposal {
 	public IContextInformation getContextInformation() {
 		return information;
 	}
-	
-	
-	
 	
 	private String extractDocumentation(IMember member) {
 		try {

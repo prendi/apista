@@ -22,19 +22,23 @@ public class JavaSourceParser {
 		parser.setSource(source.toCharArray());
 	}
 	
-	public static JavaSourceParser createFromFile(String javaFilePath, String libSourceRoot, String encoding) {
+	public static JavaSourceParser createFromFile(String file, String libsrc, String encoding) {
+		return createFromFile(file, new String[] {libsrc}, encoding);
+	}
+
+	public static JavaSourceParser createFromFile(String javaFilePath, String[] libSourceRoots, String encoding) {
 		validateFilePath(javaFilePath);
-		validateLibSourceRoot(libSourceRoot);
-		return new JavaSourceParser(readFileToString(javaFilePath), getClassName(javaFilePath), null, new String[]{libSourceRoot}, new String[]{encoding});
+		validateLibSourceRoots(libSourceRoots);
+		return new JavaSourceParser(readFileToString(javaFilePath), getClassName(javaFilePath), null, libSourceRoots, new String[]{encoding});
 	}
-	
-	public static JavaSourceParser createFromSource(String source, String className, String libSourceRoot, String encoding) {
-		validateLibSourceRoot(libSourceRoot);
-		return new JavaSourceParser(source, className, null, new String[] {libSourceRoot}, new String[] {encoding});
+
+	public static JavaSourceParser createFromSource(String source, String className, String[] libSourceRoots, String encoding) {
+		validateLibSourceRoots(libSourceRoots);
+		return new JavaSourceParser(source, className, null, libSourceRoots, new String[] {encoding});
 	}
-	
+
 	public static JavaSourceParser createFromJar(String source, String jarFilePath) {
-		
+
 		return new JavaSourceParser(readFileToString(source), getClassName(source), new String[]{jarFilePath}, null, null);
 	}
 
@@ -44,11 +48,13 @@ public class JavaSourceParser {
 		if(!f.isFile())	throw new IllegalArgumentException(filePath + " is not a file");
 		if(!f.getAbsolutePath().endsWith(".java")) throw new IllegalArgumentException(filePath + " is not a java file (.java)");
 	}
-	
-	private static void validateLibSourceRoot(String filePath) {
-		File f = new File(filePath);
-		if(!f.exists()) throw new IllegalArgumentException(filePath + " does not exist");
-		if(!f.isDirectory()) throw new IllegalArgumentException(filePath + " is not a directory");
+
+	private static void validateLibSourceRoots(String[] paths) {
+		for(String path : paths) {
+			File f = new File(path);
+			if(!f.exists()) throw new IllegalArgumentException(paths + " does not exist");
+			if(!f.isDirectory()) throw new IllegalArgumentException(paths + " is not a directory");
+		}
 	}
 
 	public CompilationUnit getCompilationUnit() {
@@ -58,12 +64,12 @@ public class JavaSourceParser {
 
 	public void parse(ASTVisitor visitor) {
 		if(unit != null) throw new IllegalStateException("Parse already executed");
-			
+
 		unit = (CompilationUnit) parser.createAST(null);
-		
-//		if(unit.getProblems().length > 0)
-//			throw new RuntimeException("code has compilation errors");
-		
+
+		//		if(unit.getProblems().length > 0)
+		//			throw new RuntimeException("code has compilation errors");
+
 		unit.accept(visitor);
 	}
 
@@ -86,10 +92,12 @@ public class JavaSourceParser {
 		}
 		return  fileData.toString();	
 	}
-	
+
 	private static String getClassName(String javaFilePath) {
 		String trim = javaFilePath.substring(0, javaFilePath.lastIndexOf('.'));
 		trim = trim.substring(trim.lastIndexOf(File.separatorChar)+1);
 		return trim;
 	}
+
+	
 }

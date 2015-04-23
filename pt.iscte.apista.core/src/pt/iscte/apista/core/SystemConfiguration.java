@@ -47,7 +47,7 @@ public class SystemConfiguration {
 	private String modelFilename;
 	private String analyzerFilename;
 	private String repPath;
-	private String srcPath;
+//	private String srcPath;
 	private String libRootPackage;
 	private String outputFolderName;
 	private String resourcesFolderName = "";
@@ -89,7 +89,7 @@ public class SystemConfiguration {
 			resourcesFolderName = properties.getProperty(RESOURCE_INPUT_FOLDER_KEY);
 
 			repPath = properties.getProperty(REP_PATH_KEY);
-			srcPath = properties.getProperty(SRC_PATH_KEY);
+//			srcPath = properties.getProperty(SRC_PATH_KEY);
 			libRootPackage = properties.getProperty(LIB_ROOT_PACKAGE_KEY);
 
 			maxProposals = Integer.parseInt(properties.getProperty(MAX_PROPOSALS_KEY));
@@ -97,7 +97,7 @@ public class SystemConfiguration {
 			String[] rawParameters = splitProperties(properties.getProperty(PARAMETERS_KEY));
 
 			modelParameters = convertRawParameters(rawParameters);
-			apiSrcPath = getSourcePathsFromRootFolder(srcPath, libRootPackage);
+			apiSrcPath = getSourcePathsFromRootFolder(properties.getProperty(SRC_PATH_KEY), libRootPackage);
 
 		} catch (IOException e) {
 			System.err.println("Problem loading the system properties on PropertiesHolder");
@@ -180,8 +180,8 @@ public class SystemConfiguration {
 		return repPath;
 	}
 
-	public String getApiSrcPath() {
-		return srcPath;
+	public String[] getApiSrcPath() {
+		return apiSrcPath;
 	}
 
 	public String getLibRootPackage() {
