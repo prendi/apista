@@ -7,5 +7,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: com.google.guava;bundle-version="15.0.0",
  pt.iscte.apista.core;bundle-version="1.0.0",
  pt.iscte.apista.extractor;bundle-version="0.1.0"
-Export-Package: pt.iscte.apista.evaluationsystem
 Import-Package: pt.iscte.apista.ngram.models
+Export-Package: pt.iscte.apista.evaluationsystem.abstracts,
+ pt.iscte.apista.evaluationsystem.methods

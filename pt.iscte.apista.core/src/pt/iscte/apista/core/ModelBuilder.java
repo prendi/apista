@@ -4,7 +4,6 @@ import java.io.File;
 
 public class ModelBuilder {
 
-
 	public static void run(SystemConfiguration configuration,Filter... filters)
 					throws Exception {
 		
@@ -20,6 +19,8 @@ public class ModelBuilder {
 
 		File output = new File(configuration.getResourceFolder()+configuration.getOutputFileName());
 		model.save(output);
-
+		
+		
+		
 	}
 }

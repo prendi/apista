@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import pt.iscte.apista.core.SystemConfiguration;
-import pt.iscte.apista.evaluationsystem.methods.CrossValidation;
+import pt.iscte.apista.evaluationsystem.methods.CrossValidationTrainTestEvaluation;
 
 public class Evaluator {
 
@@ -23,7 +23,7 @@ public class Evaluator {
 		
 //		Analyzer.run(true);
 
-		CrossValidation cv = new CrossValidation(configuration, 10);
+		CrossValidationTrainTestEvaluation cv = new CrossValidationTrainTestEvaluation(configuration, 10);
 //
 		cv.evaluate();
 		cv.reportData();

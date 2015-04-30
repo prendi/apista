@@ -3,7 +3,6 @@ package pt.iscte.apista.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -18,6 +17,8 @@ public class SystemConfiguration {
 
 	// Separator used on multiple value properties
 	private static final char PROPERTIES_SEPARATOR = ',';
+	// Separator used to define the filter's range
+	private static final char FILTER_SEPARATOR = '-';
 	// Model class used to build the model
 	private static final String MODEL_CLASS_KEY = "modelClass";
 	// Analyzer file path used when built when evaluating
@@ -38,6 +39,8 @@ public class SystemConfiguration {
 	private static final String PROPERTIES_FILE_PATH = "config.properties";
 	// Model's parameters used to configure it
 	private static final String PARAMETERS_KEY = "params";
+	// Model's filters used to build a new model 
+	private static final String FILTERS_KEY = "filters";
 	// Folder to output all the data (Model, Analyzer and results)
 	private static final String OUTPUT_FOLDER_KEY = "outputFolder";
 	// Folder to input all the data (Model, Analyzer)
@@ -47,6 +50,7 @@ public class SystemConfiguration {
 	private String modelFilename;
 	private String analyzerFilename;
 	private String repPath;
+	private Filter[] filters;
 //	private String srcPath;
 	private String libRootPackage;
 	private String outputFolderName;
@@ -95,14 +99,30 @@ public class SystemConfiguration {
 			maxProposals = Integer.parseInt(properties.getProperty(MAX_PROPOSALS_KEY));
 
 			String[] rawParameters = splitProperties(properties.getProperty(PARAMETERS_KEY));
-
+			
+			String[] rawFilters = splitProperties(properties.getProperty(FILTERS_KEY));
+			
 			modelParameters = convertRawParameters(rawParameters);
+			
+			filters = convertRawFilters(rawFilters);
+			
 			apiSrcPath = getSourcePathsFromRootFolder(properties.getProperty(SRC_PATH_KEY), libRootPackage);
 
 		} catch (IOException e) {
 			System.err.println("Problem loading the system properties on PropertiesHolder");
 			e.printStackTrace();
 		}
+	}
+
+	private Filter[] convertRawFilters(String[] rawFilters) {
+		Filter[] filters = new Filter.Range[rawFilters.length];
+		
+		for(int i = 0 ; i != rawFilters.length ; i ++){
+			String[] splittedFilter = rawFilters[i].split("" + FILTER_SEPARATOR);
+			filters[i] = new Filter.Range(Double.parseDouble(splittedFilter[0]), Double.parseDouble(splittedFilter[1]));
+		}
+		
+		return filters;
 	}
 
 	private static String[] getSourcePathsFromRootFolder(String rootFolder, String rootPackage) {
@@ -160,6 +180,11 @@ public class SystemConfiguration {
 		return parameters;
 	}
 
+	
+	public Filter[] getFilters() {
+		return filters;
+	}
+	
 	private String[] splitProperties(String s) {
 		return s.split("" + PROPERTIES_SEPARATOR);
 	}
@@ -230,23 +255,6 @@ public class SystemConfiguration {
 		if (analyzer == null)
 			analyzer = loadAnalyzerFromFile();
 		return analyzer;
-	}
-
-	/**
-	 * Displays the system configuration provided in the console
-	 * 
-	 * @param configuration
-	 *            to be displayed
-	 */
-	public void showSystemConfiguration() {
-		System.out.println("-----CONFIGURATION-----");
-		System.out.println("Repository path: " + getRepPath());
-		System.out.println("Source path: " + getApiSrcPath());
-		System.out.println("Library root package: " + getLibRootPackage());
-		System.out.println("Output file name: " + getOutputFileName());
-		System.out.println("Model file path: " + getModelFileName());
-		System.out.println("Max Proposals: " + getMaxProposals());
-		System.out.println("Parameters: " + getModelParameters());
 	}
 
 	public String getOutputFolder() {

@@ -14,8 +14,9 @@ public class Util {
 		IAnalyzer analyzer = new Analyzer();
 
 		SystemConfiguration configuration = new SystemConfiguration(
-				"/Users/andresantos/git/apista/pt.iscte.apista.integration/config.properties");
+				"C:/Users/Gonçalo/Dropbox/Thesis/Code/Resources/config.properties");
 
+		configuration.dumpProperties(System.out);
 //		analyzer.run(configuration);
 //		
 ////		analyzer = configuration.getAnalyzer();

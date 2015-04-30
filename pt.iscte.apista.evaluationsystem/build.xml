@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="jar" name="pt.iscte.apista.evaluationsystem">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../../Program Files (x86)/eclipse plugin development/"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="Plug-in Dependencies.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}plugins/com.google.guava_15.0.0.v201403281430.jar"/>
+        <pathelement location="../lib/pt.iscte.apista.core.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.core_3.10.2.v20150120-1634.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/com.instantiations.assist.eclipse.fragment.jdt.core_7.1.0.r37x201109091135.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.apt_1.1.0.v20150122-0735.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.tool_1.0.300.v20150114-1827.jar"/>
+        <pathelement location="../lib/pt.iscte.apista.extractor.jar"/>
+        <pathelement location="../lib/pt.iscte.apista.ngram.jar"/>
+    </path>
+    <path id="pt.iscte.apista.evaluationsystem.classpath">
+        <path refid="Plug-in Dependencies.libraryclasspath"/>
+        <pathelement location="bin"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.ucls"/>
+                <exclude name="**/*.useq"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="pt.iscte.apista.evaluationsystem.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+
+    <target name="jar" description="JARs the Task" depends="build">
+        <jar destfile="../lib/${ant.project.name}.jar" basedir="./bin"/>
+    </target>
+
+</project>
