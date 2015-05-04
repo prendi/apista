@@ -4,16 +4,25 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Allows a class to be parameterizable with the parameters provided in the SystemConfiguration.
+ * The parameters must be pre-processed
+ */
 public interface Parametrizable {
 
 	/**
-	 * Allows to configure the class with the parameters provided in the properties file
-	 * The parameters must be pre-processed
-	 * @param params used to configure. Must handle null params
+	 * Setups up the class according to the Parameters provided
+	 * @param params used to configure. Must handle null params.
 	 */
 	void setup(Parameters params);
 	
+	/**
+	 * Class used to access the parameters in the SystemConfiguration
+	 */
 	public static class Parameters implements Serializable{
+		/**
+		 * Maps the parameter name and its value
+		 */
 		private Map<String, String> map = new HashMap<String, String>();
 		
 		public void addParameter(String name, String value){
