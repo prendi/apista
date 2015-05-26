@@ -30,7 +30,7 @@ public abstract class APISTATask extends Task{
 		if(getProject() != null)
 			propertiesPath = getProject().getProperty(PROPERTIES_FILE_PATH_KEY);
 		else
-			propertiesPath = "..\\Resources\\config.properties";
+			propertiesPath = "../../Resources/config.properties";
 			
 		//Initializes a new SystemConfiguration with the properties provided
 		configuration = new SystemConfiguration(propertiesPath);

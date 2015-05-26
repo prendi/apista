@@ -73,7 +73,7 @@ public  class UnigramTable implements Serializable {
 				bw.flush();
 				bw.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				System.err.println("Problem writing to file on UnigramTable");
 				e.printStackTrace();
 			}
 		}

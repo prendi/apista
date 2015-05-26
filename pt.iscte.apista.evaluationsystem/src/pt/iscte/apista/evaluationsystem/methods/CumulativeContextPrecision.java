@@ -44,7 +44,7 @@ public class CumulativeContextPrecision extends ContextPrecision{
 			bw.close();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Problem writing to file on CumulativeContextPrecision");
 			e.printStackTrace();
 		}
 	

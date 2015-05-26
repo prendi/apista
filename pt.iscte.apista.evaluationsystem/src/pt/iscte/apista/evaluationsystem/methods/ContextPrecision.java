@@ -102,7 +102,7 @@ public class ContextPrecision extends AEvaluationMethod {
 			bw.close();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Problem writing to file on ContextPrecision");
 			e.printStackTrace();
 		}
 		

@@ -1,6 +1,10 @@
 package pt.iscte.apista.extractor;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +12,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import pt.iscte.apista.core.Filter;
 import pt.iscte.apista.core.IAnalyzer;
@@ -24,6 +33,9 @@ public class Analyzer implements IAnalyzer, Serializable {
 	private int nFiles;
 	private String packageRoot;
 	private Filter[] filters;
+	
+	
+	private BufferedOutputStream fos;
 
 
 	public Filter[] getFilters() {
@@ -44,18 +56,49 @@ public class Analyzer implements IAnalyzer, Serializable {
 	//		sentences = new ArrayList<>();
 	//	}
 
+//	public Sentence newSentence(int startLine) {
+//
+//		if (!sentences.isEmpty()
+//				&& sentences.get(sentences.size() - 1).isEmpty()) {
+//			return sentences.get(sentences.size() - 1);
+//		} else {
+//			Sentence s = new Sentence(filePath, startLine);
+//			sentences.add(s);
+//			return s;
+//		}
+//	}
 
+	private Sentence sentence;
+	
 	public Sentence newSentence(int startLine) {
-		if (!sentences.isEmpty()
-				&& sentences.get(sentences.size() - 1).isEmpty()) {
-			return sentences.get(sentences.size() - 1);
-		} else {
-			Sentence s = new Sentence(filePath, startLine);
-			sentences.add(s);
-			return s;
+		
+		if(sentence == null){
+			sentence = new Sentence(filePath, startLine);
 		}
-	}
+		
+		if(sentence.isEmpty()){
+			return sentence;
+		}else {
+			try{
+				if(sentence.getInstructions().size() > 1){
+					for(Instruction instruction : sentence.getInstructions()){
+						fos.write(instruction.getWord().getBytes());
+						fos.write(" ".getBytes());
+					}
+					fos.write("\n".getBytes());
+				}
+				sentence = new Sentence(filePath, startLine);
+				return sentence;
 
+			}catch(IOException e){
+				//TODO
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	
 	public String getPackageRoot() {
 		return packageRoot;
 	}
@@ -92,10 +135,11 @@ public class Analyzer implements IAnalyzer, Serializable {
 
 		return false;
 	}
+	
 
-	void addInstruction(Instruction instruction) {
-		sentences.get(sentences.size() - 1).addInstruction(instruction);
-	}
+//	void addInstruction(Instruction instruction) {
+//		sentences.get(sentences.size() - 1).addInstruction(instruction);
+//	}
 
 	public int getTotalOccurrences() {
 		int total = 0;
@@ -178,23 +222,70 @@ public class Analyzer implements IAnalyzer, Serializable {
 
 	private String filePath;
 
-	private void parse(File file, String[] libSrc) {
+//	private void parse(File file, String[] libSrc) {
+//
+//		if (file.isFile() && file.getName().endsWith(".java")) {
+//			long time = System.currentTimeMillis();
+//			filePath = file.getAbsolutePath();
+//
+////			JavaSourceParser parser = JavaSourceParser.createFromJar(
+////					filePath, libSrc);
+//			JavaSourceParser parser = JavaSourceParser.createFromFile(filePath, libSrc, "UTF-8");
+//
+//			BlockVisitorV3 v = new BlockVisitorV3(this);
+//			try{
+//				parser.parse(v);
+//			}catch(Exception e){
+//				System.out.println("ERROR ON FILE: " + file.getAbsolutePath() + ":" + v.getCurrentLine());
+//				e.printStackTrace();
+//			}
+//			nFiles++;
+//			if(System.currentTimeMillis() - time > 1000){
+//				System.err.println("TOOK - " +(System.currentTimeMillis() - time) +" ERROR ON: " + nFiles + " - " + file.getAbsolutePath());
+//			}
+//			if(nFiles % 1000 == 0){
+//				System.out.println("In progress " + nFiles  + " - " +file.getAbsolutePath());
+//			}
+//			
+//		} else if (file.isDirectory() && !file.getName().startsWith(".")) {
+//			for (File c : file.listFiles())
+//				parse(c, libSrc);
+//		}
+//	}
+	
+	private void parse(File file, final String[] libSrc) {
 
 		if (file.isFile() && file.getName().endsWith(".java")) {
+			long time = System.currentTimeMillis();
 			filePath = file.getAbsolutePath();
 
 //			JavaSourceParser parser = JavaSourceParser.createFromJar(
 //					filePath, libSrc);
-			JavaSourceParser parser = JavaSourceParser.createFromFile(filePath, libSrc, "UTF-8");
-
-			BlockVisitorV3 v = new BlockVisitorV3(this);
+			
 			try{
-				parser.parse(v);
+				 ExecutorService executor = Executors.newSingleThreadExecutor();
+				 Callable<String> callable = new Callable<String>() {
+
+						@Override
+						public String call() throws Exception {
+							JavaSourceParser parser = JavaSourceParser.createFromFile(filePath, libSrc, "UTF-8");
+							BlockVisitorV3 v = new BlockVisitorV3(Analyzer.this);
+							parser.parse(v);
+							return null;
+						}
+					};
+				 Future<String> future = executor.submit(callable);
+				 future.get(5, TimeUnit.MINUTES);
+				 
 			}catch(Exception e){
-				System.out.println("ERROR ON FILE: " + file.getAbsolutePath() + ":" + v.getCurrentLine());
+				System.out.println("ERROR ON FILE: " + file.getAbsolutePath());// + ":" + v.getCurrentLine());
 				e.printStackTrace();
 			}
 			nFiles++;
+			if(nFiles % 1000 == 0){
+				System.out.println("In progress " + nFiles  + " - " +file.getAbsolutePath());
+			}
+			
 		} else if (file.isDirectory() && !file.getName().startsWith(".")) {
 			for (File c : file.listFiles())
 				parse(c, libSrc);
@@ -208,9 +299,16 @@ public class Analyzer implements IAnalyzer, Serializable {
 
 	@Override
 	public void run(SystemConfiguration configuration) {
-
-		run(configuration.getLibRootPackage(), configuration.getRepPath(), configuration.getApiSrcPath());
-
+		try {
+			fos = new BufferedOutputStream(new FileOutputStream( new File(configuration.getOutputFolder() + configuration.getAnalyzerFileName())));
+			
+			run(configuration.getLibRootPackage(), configuration.getRepPath(), configuration.getApiSrcPath());
+			
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void run(String packageRoot, String repPath, String srcPath){

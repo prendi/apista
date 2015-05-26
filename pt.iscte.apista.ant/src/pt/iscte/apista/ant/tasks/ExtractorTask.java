@@ -1,9 +1,5 @@
 package pt.iscte.apista.ant.tasks;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-
 import pt.iscte.apista.ant.APISTATask;
 import pt.iscte.apista.core.IAnalyzer;
 import pt.iscte.apista.extractor.Analyzer;
@@ -29,15 +25,15 @@ public class ExtractorTask extends APISTATask{
 			analyzer.run(configuration);
 			
 			//Randomizes the sentences in the analyzer in order to 
-			analyzer.randomizeSentences(2015);
+//			analyzer.randomizeSentences(2015);
 			
 			//Serialize the analyzer
-			FileOutputStream fos = new FileOutputStream(new File(configuration.getResourceFolder() + configuration.getAnalyzerFileName()));
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(analyzer);
-			oos.close();
+//			FileOutputStream fos = new FileOutputStream(new File(configuration.getResourceFolder() + configuration.getAnalyzerFileName()));
+//			ObjectOutputStream oos = new ObjectOutputStream(fos);
+//			oos.writeObject(analyzer);
+//			oos.close();
 			
-			analyzer = configuration.getAnalyzer();
+//			analyzer = configuration.getAnalyzer();
 			
 			System.out.println(analyzer.getAllSentences().size());
 			
@@ -46,5 +42,10 @@ public class ExtractorTask extends APISTATask{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	
+	public static void main(String[] args) {
+		new ExtractorTask().execute();
 	}
 }

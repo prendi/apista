@@ -143,7 +143,7 @@ public class BlockVisitorV3 extends ASTVisitor{
 			startLine = getLineNumber(node);
 			endLine = getEndLineNumber(node);
 			
-			if(blockLine != -1 && (blockLine < startLine || blockLine > endLine))
+			if(blockLine != -1 && (blockLine < startLine || blockLine > endLine))//|| endLine-startLine > 200
 				return false;
 		}
 		return visit;

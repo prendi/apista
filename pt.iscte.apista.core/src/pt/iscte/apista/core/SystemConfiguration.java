@@ -19,6 +19,8 @@ public class SystemConfiguration {
 	private static final char PROPERTIES_SEPARATOR = ',';
 	// Separator used to define the filter's range
 	private static final char FILTER_SEPARATOR = '-';
+	
+
 	// Model class used to build the model
 	private static final String MODEL_CLASS_KEY = "modelClass";
 	// Analyzer file path used when built when evaluating
@@ -45,13 +47,15 @@ public class SystemConfiguration {
 	private static final String OUTPUT_FOLDER_KEY = "outputFolder";
 	// Folder to input all the data (Model, Analyzer)
 	private static final String RESOURCE_INPUT_FOLDER_KEY = "resourceFolder";
+	// Folder to copy the projects that contain the API
+	private static final String TARGET_FOLDER_KEY = "targetPath";
 
+	private String targetPath;
 	private String outputFileName;
 	private String modelFilename;
 	private String analyzerFilename;
 	private String repPath;
 	private Filter[] filters;
-//	private String srcPath;
 	private String libRootPackage;
 	private String outputFolderName;
 	private String resourcesFolderName = "";
@@ -88,12 +92,11 @@ public class SystemConfiguration {
 			modelFilename = properties.getProperty(MODEL_FILE_KEY);
 			outputFileName = properties.getProperty(OUTPUT_FILE_NAME_KEY);
 			analyzerFilename = properties.getProperty(ANALYZER_FILE_KEY);
-
+			targetPath = properties.getProperty(TARGET_FOLDER_KEY);
 			outputFolderName = properties.getProperty(OUTPUT_FOLDER_KEY);
 			resourcesFolderName = properties.getProperty(RESOURCE_INPUT_FOLDER_KEY);
 
 			repPath = properties.getProperty(REP_PATH_KEY);
-//			srcPath = properties.getProperty(SRC_PATH_KEY);
 			libRootPackage = properties.getProperty(LIB_ROOT_PACKAGE_KEY);
 
 			maxProposals = Integer.parseInt(properties.getProperty(MAX_PROPOSALS_KEY));
@@ -189,6 +192,10 @@ public class SystemConfiguration {
 		return s.split("" + PROPERTIES_SEPARATOR);
 	}
 
+	public String getTargetPath() {
+		return targetPath;
+	}
+	
 	public String getOutputFileName() {
 		return outputFileName;
 	}
@@ -265,11 +272,13 @@ public class SystemConfiguration {
 	}
 
 	public String getResourceFolder() throws FileNotFoundException {
+		
 		if (resourcesFolderName != "") {
 			File f = new File(resourcesFolderName);
 			if (!f.exists())
 				throw new FileNotFoundException("The input folder specified was not found");
 		}
+		
 		return resourcesFolderName + File.separator;
 	}
 

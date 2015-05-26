@@ -58,7 +58,7 @@ public class CrossEntropy extends AEvaluationMethod {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Problem writing to file on CrossEntropy");
 			e.printStackTrace();
 		}
 		
