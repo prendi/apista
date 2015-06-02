@@ -10,17 +10,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
+import org.eclipse.jdt.core.IType;
+
+import pt.iscte.apista.core.ConstructorInstruction;
 import pt.iscte.apista.core.Filter;
 import pt.iscte.apista.core.IAnalyzer;
+import pt.iscte.apista.core.ITypeCache;
 import pt.iscte.apista.core.Instruction;
+import pt.iscte.apista.core.MethodInstruction;
 import pt.iscte.apista.core.Sentence;
 import pt.iscte.apista.core.SystemConfiguration;
 
@@ -33,8 +41,6 @@ public class Analyzer implements IAnalyzer, Serializable {
 	private int nFiles;
 	private String packageRoot;
 	private Filter[] filters;
-	
-	
 	private BufferedOutputStream fos;
 
 
@@ -156,6 +162,7 @@ public class Analyzer implements IAnalyzer, Serializable {
 		nFiles = 0;
 		parse(new File(repositoryRoot), libSrcRoot);
 		time = (System.currentTimeMillis() - t) / 1000;
+		System.out.println("FILES FAILED: " + numberOfFilesFailed);
 	}
 
 	public long getTime() {
@@ -253,6 +260,8 @@ public class Analyzer implements IAnalyzer, Serializable {
 //		}
 //	}
 	
+	private int numberOfFilesFailed = 0;
+	
 	private void parse(File file, final String[] libSrc) {
 
 		if (file.isFile() && file.getName().endsWith(".java")) {
@@ -278,6 +287,7 @@ public class Analyzer implements IAnalyzer, Serializable {
 				 future.get(5, TimeUnit.MINUTES);
 				 
 			}catch(Exception e){
+				numberOfFilesFailed++;
 				System.out.println("ERROR ON FILE: " + file.getAbsolutePath());// + ":" + v.getCurrentLine());
 				e.printStackTrace();
 			}
@@ -297,6 +307,34 @@ public class Analyzer implements IAnalyzer, Serializable {
 		return sentences.get(0);
 	}
 
+	@Override
+	public void loadSentences(File file){
+		try {
+			Scanner s = new Scanner(file);
+			while(s.hasNextLine()){
+				String[] words = s.nextLine().split(" ");
+				
+				Sentence newSentence = new Sentence();
+				for (String word : words) {
+					String[] splittedMethodWord = word.split("\\.");
+					
+					if(splittedMethodWord[1].equals("new")){
+						newSentence.addInstruction(new ConstructorInstruction(splittedMethodWord[0]));
+					}else{
+						newSentence.addInstruction(new MethodInstruction(splittedMethodWord[0], splittedMethodWord[1]));
+					}
+				}
+				sentences.add(newSentence);
+			}
+			System.out.println("ADDED " + sentences.size() + " SENTENCES");
+			
+		} catch (FileNotFoundException e) {
+			System.err.println("The file " + file.getName() + " was not found");
+			e.printStackTrace();
+		}
+		
+	}
+	
 	@Override
 	public void run(SystemConfiguration configuration) {
 		try {

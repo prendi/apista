@@ -4,72 +4,54 @@
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. --><project basedir="." default="jar" name="pt.iscte.apista.ant">
-    <property environment="env"/>
     <property name="ECLIPSE_HOME" value="../../../Program Files (x86)/eclipse plugin development/"/>
+    <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
     <path id="Plug-in Dependencies.libraryclasspath">
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-antlr.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-apache-bcel.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-apache-bsf.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-apache-log4j.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-apache-oro.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-apache-regexp.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-apache-resolver.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-apache-xalan2.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-commons-logging.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-commons-net.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-jai.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-javamail.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-jdepend.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-jmf.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-jsch.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-junit.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-junit4.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-launcher.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-netrexx.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-swing.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant-testutil.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.ant_1.9.2.v201404171502/lib/ant.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.core_3.10.2.v20150120-1634.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/com.instantiations.assist.eclipse.fragment.jdt.core_7.1.0.r37x201109091135.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.apt_1.1.0.v20150122-0735.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.tool_1.0.300.v20150114-1827.jar"/>
+        <pathelement location="${ANT_HOME}/lib/*.jar"/>
         <pathelement location="../lib/pt.iscte.apista.extractor.jar"/>
         <pathelement location="../lib/pt.iscte.apista.core.jar"/>
         <pathelement location="../lib/pt.iscte.apista.ant.jar"/>
         <pathelement location="../lib/pt.iscte.apista.ngram.jar"/>
         <pathelement location="../lib/pt.iscte.apista.evaluationsystem.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.core.runtime_3.10.0.v20140318-2214.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/javax.annotation_1.2.0.v201401042248.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/javax.inject_1.0.0.v20091030.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.osgi_3.10.2.v20150203-1939.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.osgi.compatibility.state_1.0.1.v20140709-1414.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.equinox.common_3.6.200.v20130402-1505.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.core.jobs_3.6.1.v20141014-1248.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.core.runtime.compatibility.registry_3.5.300.v20140128-0851/runtime_registry_compatibility.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.equinox.registry_3.5.400.v20140428-1507.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.equinox.preferences_3.5.200.v20140224-1527.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.core.contenttype_3.4.200.v20140207-1251.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.equinox.app_1.3.200.v20130910-1609.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.core.resources_3.9.1.v20140825-1431.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt_3.10.1.v20150204-1700.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.core_3.10.2.v20150120-1634.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/com.instantiations.assist.eclipse.fragment.jdt.core_7.1.0.r37x201109091135.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.apt_1.1.0.v20150122-0735.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.tool_1.0.300.v20150114-1827.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.swt_3.103.2.v20150203-1313.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/com.instantiations.assist.eclipse.fragment.swt_7.1.0.r37x201109091135.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.swt.win32.win32.x86_64_3.103.2.v20150203-1351.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/com.google.guava_15.0.0.v201403281430.jar"/>
 
+    </path>
+    <path id="main.extlibs.class.path">
+        <fileset dir="${ECLIPSE_HOME}/plugins">
+        <include name="**/com.instantiations.assist.eclipse.fragment.jdt.core*.jar"/>
+        <include name="**/org.eclipse.jdt.compiler.apt*.jar"/>
+        <include name="**/org.eclipse.jdt.compiler.tool*.jar"/>
+        <include name="**/org.eclipse.core.runtime*.jar"/>
+        <include name="**/javax.annotation*.jar"/>
+        <include name="**/javax.inject*.jar"/>
+        <include name="**/org.eclipse.osgi*.jar"/>
+        <include name="**/org.eclipse.osgi.compatibility.state*.jar"/>
+        <include name="**/org.eclipse.equinox.common*.jar"/>
+        <include name="**/org.eclipse.core.jobs*.jar"/>
+        <include name="**/org.eclipse.core.runtime.compatibility.registry*/runtime_registry_compatibility.jar"/>
+        <include name="**/org.eclipse.equinox.registry*.jar"/>
+        <include name="**/org.eclipse.equinox.preferences*.jar"/>
+        <include name="**/org.eclipse.core.contenttype*.jar"/>
+        <include name="**/org.eclipse.equinox.app*.jar"/>
+        <include name="**/org.eclipse.core.resources*.jar"/>
+        <include name="**/org.eclipse.jdt_*.jar"/>
+        <include name="**/org.eclipse.jdt.core*.jar"/>
+        <include name="**/com.instantiations.assist.eclipse.fragment.jdt.core*.jar"/>
+        <include name="**/org.eclipse.jdt.compiler.apt*.jar"/>
+        <include name="**/org.eclipse.jdt.compiler.tool*.jar"/>
+        <include name="**/org.junit*/junit.jar"/>
+        <include name="**/org.hamcrest.core*.jar"/>
+        <include name="**/org.eclipse.swt*.jar"/>
+        <include name="**/com.instantiations.assist.eclipse.fragment.swt*.jar"/>
+        <include name="**/org.eclipse.swt.win32.win32.x86_64*.jar"/>
+        <include name="**/com.google.guava*.jar"/>
+
+        </fileset>
     </path>
     <path id="pt.iscte.apista.ant.classpath">
         <path refid="Plug-in Dependencies.libraryclasspath"/>
-        <pathelement location="bin"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -93,7 +75,10 @@
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <compilerarg line="-Xms3072M -Xmx3072M -XX:MaxPermSize=3072M"/>
             <src path="src"/>
-            <classpath refid="Plug-in Dependencies.libraryclasspath"/>
+            <classpath>
+                    <path refid="Plug-in Dependencies.libraryclasspath"/>
+                    <path refid="main.extlibs.class.path"/>
+             </classpath>
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
@@ -114,7 +99,10 @@
     <target name="extract" description="Use the Task" depends="jar">
         <echo message="Using properties file: ${propertiesPath}" />
         <taskdef name="go" classname="pt.iscte.apista.ant.tasks.ExtractorTask">
-             <classpath refid="Plug-in Dependencies.libraryclasspath"/>
+                         <classpath>
+                    <path refid="Plug-in Dependencies.libraryclasspath"/>
+                    <path refid="main.extlibs.class.path"/>
+             </classpath>
         </taskdef>
         <go/>
     </target>
@@ -124,7 +112,10 @@
     <target name="evaluate" description="Use the Task" depends="jar">
         <echo message="Using properties file: ${propertiesPath}" />
         <taskdef name="go" classname="pt.iscte.apista.ant.tasks.EvaluatorTask">
-             <classpath refid="Plug-in Dependencies.libraryclasspath"/>
+                        <classpath>
+                    <path refid="Plug-in Dependencies.libraryclasspath"/>
+                    <path refid="main.extlibs.class.path"/>
+             </classpath>
         </taskdef>
         <go/>
     </target>
@@ -132,7 +123,10 @@
     <target name="find" description="Use the Task" depends="jar">
         <echo message="Using properties file: ${propertiesPath}" />
         <taskdef name="go" classname="pt.iscte.apista.ant.tasks.APIFinderTask">
-             <classpath refid="Plug-in Dependencies.libraryclasspath"/>
+                         <classpath>
+                    <path refid="Plug-in Dependencies.libraryclasspath"/>
+                    <path refid="main.extlibs.class.path"/>
+             </classpath>
         </taskdef>
         <go/>
     </target>
@@ -140,7 +134,10 @@
      <target name="build-model" description="Use the Task" depends="jar">
         <echo message="Using properties file: ${propertiesPath}" />
         <taskdef name="go" classname="pt.iscte.apista.ant.tasks.ModelBuilderTask">
-             <classpath refid="Plug-in Dependencies.libraryclasspath"/>
+                         <classpath>
+                    <path refid="Plug-in Dependencies.libraryclasspath"/>
+                    <path refid="main.extlibs.class.path"/>
+             </classpath>
         </taskdef>
         <go/>
     </target>

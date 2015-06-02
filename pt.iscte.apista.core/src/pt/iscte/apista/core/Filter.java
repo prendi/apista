@@ -43,6 +43,20 @@ public interface Filter {
 			this.min = min;
 			this.max = max;
 		}
+		
+		public static Filter[] getCrossValidationTestFilters(int numberOfValidations){
+			Filter[] filters = new Filter[numberOfValidations];
+			double testPercentage = 1 / (double) (numberOfValidations);
+
+			for (int i = 0; i != numberOfValidations; i++) {
+				double min = (double) i / (double) numberOfValidations;
+
+				double max = min + testPercentage;
+
+				filters[i] = new Filter.Range(min, max);
+			}
+			return filters;
+		}
 
 		@Override
 		public Filter[] getInverseFilters() {

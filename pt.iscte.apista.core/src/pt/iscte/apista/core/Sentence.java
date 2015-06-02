@@ -18,7 +18,10 @@ public class Sentence implements Iterable<Instruction>, Serializable {
 		this.blockLine = blockLine;
 		list = new ArrayList<>();
 	}
-
+	
+	public Sentence(){
+		this("",0);
+	}
 	
 	public void addInstruction(Instruction instruction) {
 		list.add(instruction);

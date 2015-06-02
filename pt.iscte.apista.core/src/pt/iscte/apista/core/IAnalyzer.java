@@ -1,5 +1,6 @@
 package pt.iscte.apista.core;
 
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +14,12 @@ public interface IAnalyzer {
 	 * @param configuration
 	 */
 	void run(SystemConfiguration configuration);
+	
+	/**
+	 * Initializes the sentences list on the Analyzer by reading the sentences extracted from a file
+	 * @param file containing the sentences to be loaded
+	 */
+	void loadSentences(File file);
 	
 	/**
 	 * Returns a list with the sentences within the filters' boundaries.

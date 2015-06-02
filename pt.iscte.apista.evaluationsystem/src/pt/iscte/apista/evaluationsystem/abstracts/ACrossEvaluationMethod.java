@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import pt.iscte.apista.core.Filter;
+import pt.iscte.apista.core.Filter.Range;
 import pt.iscte.apista.core.SystemConfiguration;
 import pt.iscte.apista.evaluationsystem.EvaluationData;
 
@@ -31,17 +32,17 @@ public abstract class ACrossEvaluationMethod extends AEvaluator {
 		// Builds the filters for the cross validation, according to the number
 		// of validations
 
-		filters = new Filter[numberOfValidations];
+		filters = Range.getCrossValidationTestFilters(numberOfValidations);
 
-		double testPercentage = 1 / (double) (numberOfValidations);
-
-		for (int i = 0; i != numberOfValidations; i++) {
-			double min = (double) i / (double) numberOfValidations;
-
-			double max = min + testPercentage;
-
-			filters[i] = new Filter.Range(min, max);
-		}
+//		double testPercentage = 1 / (double) (numberOfValidations);
+//
+//		for (int i = 0; i != numberOfValidations; i++) {
+//			double min = (double) i / (double) numberOfValidations;
+//
+//			double max = min + testPercentage;
+//
+//			filters[i] = new Filter.Range(min, max);
+//		}
 	}
 
 	@Override
