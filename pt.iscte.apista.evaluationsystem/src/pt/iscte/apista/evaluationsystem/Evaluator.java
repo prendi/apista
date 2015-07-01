@@ -23,7 +23,7 @@ public class Evaluator {
 		
 //		Analyzer.run(true);
 
-		CrossValidationTrainTestEvaluation cv = new CrossValidationTrainTestEvaluation(configuration, 10);
+		CrossValidationTrainTestEvaluation cv = new CrossValidationTrainTestEvaluation(configuration);
 //
 		cv.evaluate();
 		cv.reportData();

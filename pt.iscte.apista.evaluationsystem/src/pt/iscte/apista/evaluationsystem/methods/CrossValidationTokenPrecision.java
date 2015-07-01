@@ -15,9 +15,8 @@ import pt.iscte.apista.evaluationsystem.abstracts.ACrossEvaluationMethod;
 
 public class CrossValidationTokenPrecision extends ACrossEvaluationMethod{
 
-	public CrossValidationTokenPrecision(SystemConfiguration configuration,
-			int numberOfValidations) {
-		super(configuration, numberOfValidations, TokenPrecision.class);
+	public CrossValidationTokenPrecision(SystemConfiguration configuration) {
+		super(configuration, TokenPrecision.class);
 	}
 
 

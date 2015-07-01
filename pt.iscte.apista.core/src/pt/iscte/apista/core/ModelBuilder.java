@@ -1,7 +1,10 @@
 package pt.iscte.apista.core;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+
+import org.osgi.framework.Configurable;
 /**
  * Class used to build a sentence model.
  **/
@@ -32,6 +35,18 @@ public class ModelBuilder {
 		//Builds the model with the analyzer
 		model.build(analyzer);
 
+		//Save the model to a file
+		File output = new File(configuration.getResourceFolder()+configuration.getOutputFileName());
+		model.save(output);
+		
+	}
+	
+	public static void load(SystemConfiguration configuration, File modelFile) throws IOException{
+		
+		APIModel model = configuration.getModel();
+		
+		model.load(new FileInputStream(modelFile));
+		
 		//Save the model to a file
 		File output = new File(configuration.getResourceFolder()+configuration.getOutputFileName());
 		model.save(output);

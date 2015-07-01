@@ -29,6 +29,11 @@ public class MethodInstruction extends Instruction {
 		this.methodName = methodName;
 		this.isStatic = false;
 	}
+	
+	public MethodInstruction(String instruction){
+		this(instruction.substring(0, instruction.indexOf(".")), 
+				instruction.substring(instruction.indexOf("."), instruction.length()).replace(".", ""));
+	}
 
 	public String getMethodName() {
 		return methodName;

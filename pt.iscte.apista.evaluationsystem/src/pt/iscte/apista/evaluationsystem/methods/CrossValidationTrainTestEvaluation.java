@@ -13,8 +13,8 @@ import pt.iscte.apista.evaluationsystem.abstracts.ACrossEvaluationMethod;
 public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 
 	
-	public CrossValidationTrainTestEvaluation(SystemConfiguration configuration, int numberOfValidations) {
-		super(configuration, numberOfValidations, TrainTestEvaluation.class);
+	public CrossValidationTrainTestEvaluation(SystemConfiguration configuration) {
+		super(configuration, TrainTestEvaluation.class);
 	}
 
 	@Override

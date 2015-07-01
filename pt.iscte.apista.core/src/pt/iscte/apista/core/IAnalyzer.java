@@ -63,4 +63,8 @@ public interface IAnalyzer {
 	 */
 	void randomizeSentences(long seed);
 	
+	/**
+	 * Serializes the analyzer so it can be loaded afterwards for evaluation purposes
+	 */
+	void loadAndSerializeAnalyzer(File loadFile, File outputfile);
 }

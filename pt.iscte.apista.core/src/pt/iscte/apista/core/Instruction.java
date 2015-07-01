@@ -26,10 +26,6 @@ public abstract class Instruction implements Serializable{
 
 	private Set<Instruction> dependencies;
 
-	public static final Instruction START = new SentenceStart();
-	public static final Instruction END = new SentenceEnd();
-	public static final Instruction UNK = new UnknownInstruction();
-
 	protected Instruction(ASTNode node, ITypeBinding binding) {
 		this.line = ((CompilationUnit) node.getRoot()).getLineNumber(node.getStartPosition());
 		qualifiedName = binding.getQualifiedName();
@@ -126,54 +122,6 @@ public abstract class Instruction implements Serializable{
 		return className;
 	}
 
-	private static class SentenceStart extends Instruction {
-		protected SentenceStart() {
-			super("");
-		}
-
-		@Override
-		public String getWord() {
-			return "$START$";
-		}
-
-		@Override
-		public String resolveInstruction(IType type, Map<String, IType> vars, ITypeCache typeCache) {
-			throw new UnsupportedOperationException();
-		}	
-	}
-
-	private static class SentenceEnd extends Instruction {
-		protected SentenceEnd() {
-			super("");
-		}
-
-		@Override
-		public String getWord() {
-			return "$END$";
-		}
-
-		@Override
-		public String resolveInstruction(IType type, Map<String, IType> vars, ITypeCache typeCache) {
-			throw new UnsupportedOperationException();
-		}	
-	}
-	
-	
-	private static class UnknownInstruction extends Instruction {
-		protected UnknownInstruction() {
-			super("");
-		}
-
-		@Override
-		public String getWord() {
-			return "$UNK$";
-		}
-
-		@Override
-		public String resolveInstruction(IType type, Map<String, IType> vars, ITypeCache typeCache) {
-			throw new UnsupportedOperationException();
-		}	
-	}
 	
 	@Override
 	public int hashCode() {

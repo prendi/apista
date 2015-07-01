@@ -19,6 +19,10 @@ public class InstructionInfo implements Serializable {
 		
 	}
 	
+	public InstructionInfo(double relativeFrequency) {
+		this.relativeFrequency = relativeFrequency;
+	}
+	
 	public int getFrequency() {
 		return frequency;
 	}

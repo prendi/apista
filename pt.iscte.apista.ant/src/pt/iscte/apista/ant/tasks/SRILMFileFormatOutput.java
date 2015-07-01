@@ -1,14 +1,19 @@
 package pt.iscte.apista.ant.tasks;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import pt.iscte.apista.ant.APISTATask;
+import pt.iscte.apista.core.ConstructorInstruction;
 import pt.iscte.apista.core.Instruction;
+import pt.iscte.apista.core.MethodInstruction;
 import pt.iscte.apista.core.Sentence;
 
 public class SRILMFileFormatOutput extends APISTATask {
@@ -19,7 +24,7 @@ public class SRILMFileFormatOutput extends APISTATask {
 
 		try {
 			loadLanguageModel(new FileInputStream(
-					configuration.getResourceFolder() + "ResultLM.lm"));
+					configuration.getResourceFolder() + configuration.getModelFileName()));
 			/*lexiconOutput(new FileOutputStream(configuration.getOutputFolder()
 					+ "Lexicon.txt"));
 			sentencesOutput(new FileOutputStream(
@@ -44,16 +49,32 @@ public class SRILMFileFormatOutput extends APISTATask {
 					found3Gram = true;
 				}
 			}
-			while (s.hasNext()) {
-//				String[] temp = s.nextLine().split("\\t");
-//				if(temp.length > 1);
-//					System.out.println(s.nextLine().split("\\t")[1]);
-				System.out.println(s.nextLine().charAt(0));
+			String nextline;
+			while (s.hasNext() && !((nextline = s.nextLine()).equals(""))) {
+				String[] splittedLine = nextline.split("\t");
+				double probability = Double.parseDouble(splittedLine[0]);
+				List<Instruction> list = new ArrayList<Instruction>();
+				String[] ngrams = splittedLine[1].split(" ");
+				for (int i = 0; i < ngrams.length; i++) {
+					if(ngrams[i].contains(".new")){
+						list.add(new ConstructorInstruction(ngrams[i].replace(".new", ""))); 
+					}else if(ngrams[i].equals("<s>")){
+						list.add(new ConstructorInstruction(ngrams[i]));
+					}else if(ngrams[i].equals("</s>")){
+						list.add(new ConstructorInstruction(ngrams[i]));
+					}else{
+						list.add(new MethodInstruction(ngrams[i]));
+					}
+				}
+				System.out.println(list.size());
+//				System.out.println(nextline.split("\t")[0] + " OMG " + nextline.split("\t")[1]);
+//				System.out.println(nextline.split("\t")[1].split(" ")[0] + " " +nextline.split("\t")[1].split(" ")[1] + " " + nextline.split("\t")[1].split(" ")[2]);
 			}
 		} finally {
 			if(s != null)
 				s.close();
 		}
+
 
 	}
 

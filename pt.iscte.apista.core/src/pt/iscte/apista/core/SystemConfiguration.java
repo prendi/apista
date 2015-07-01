@@ -15,16 +15,22 @@ import pt.iscte.apista.core.Parametrizable.Parameters;
 
 public class SystemConfiguration {
 
+	// Suffix output of the analyzer's test set
+	public static final String ANALYZER_TEST_SUFFIX = "_TEST_";
+	// Suffix output of the analyzer's training set
+	public static final String ANALYZER_TRAINING_SUFFIX = "_TRAINING_";
+	
 	// Separator used on multiple value properties
 	private static final char PROPERTIES_SEPARATOR = ',';
 	// Separator used to define the filter's range
 	private static final char FILTER_SEPARATOR = '-';
 	
-
 	// Model class used to build the model
 	private static final String MODEL_CLASS_KEY = "modelClass";
-	// Analyzer file path used when built when evaluating
-	private static final String ANALYZER_FILE_KEY = "analyzerFile";
+	// Analyzer file path used to be serialized and evaluate the model (must be in SRILM format)
+	private static final String SRILM_ANALYZER_FILE_KEY = "SRILMAnalyzerFile";
+	// Analyzer file path used to load to the system and used to build the model if srilm is not being used, and to evaluate
+	private static final String SERIALIZED_ANALYZER_FILE_KEY = "SerializedAnalyzerFile";
 	// Model file path used when built when evaluating
 	private static final String MODEL_FILE_KEY = "modelFile";
 	// Repository path
@@ -49,11 +55,16 @@ public class SystemConfiguration {
 	private static final String RESOURCE_INPUT_FOLDER_KEY = "resourceFolder";
 	// Folder to copy the projects that contain the API
 	private static final String TARGET_FOLDER_KEY = "targetPath";
+	// Determines if SRILM is used to produce the language models
+	private static final String SRILM_USAGE_KEY = "useSRILM";
+	// Number of validations if evaluation is executed
+	private static final String NUMBER_OF_VALIDATIONS_KEY = "numberOfValidations";
 
 	private String targetPath;
 	private String outputFileName;
 	private String modelFilename;
-	private String analyzerFilename;
+	private String serializedAnalyzerFilename;
+	private String srilmAnalyzerFilename;
 	private String repPath;
 	private Filter[] filters;
 	private String libRootPackage;
@@ -64,6 +75,8 @@ public class SystemConfiguration {
 	private Parameters modelParameters;
 	private Class<? extends APIModel> modelClass;
 	private int maxProposals;
+	private boolean srilm;
+	private int numberOfValidations;
 	private IAnalyzer analyzer;
 
 	private String[] apiSrcPath;
@@ -91,13 +104,17 @@ public class SystemConfiguration {
 
 			modelFilename = properties.getProperty(MODEL_FILE_KEY);
 			outputFileName = properties.getProperty(OUTPUT_FILE_NAME_KEY);
-			analyzerFilename = properties.getProperty(ANALYZER_FILE_KEY);
+			serializedAnalyzerFilename = properties.getProperty(SERIALIZED_ANALYZER_FILE_KEY);
+			srilmAnalyzerFilename = properties.getProperty(SRILM_ANALYZER_FILE_KEY);
 			targetPath = properties.getProperty(TARGET_FOLDER_KEY);
 			outputFolderName = properties.getProperty(OUTPUT_FOLDER_KEY);
 			resourcesFolderName = properties.getProperty(RESOURCE_INPUT_FOLDER_KEY);
-
 			repPath = properties.getProperty(REP_PATH_KEY);
 			libRootPackage = properties.getProperty(LIB_ROOT_PACKAGE_KEY);
+			
+			srilm = Boolean.parseBoolean(properties.getProperty(SRILM_USAGE_KEY));
+			
+			numberOfValidations = Integer.parseInt(properties.getProperty(NUMBER_OF_VALIDATIONS_KEY));
 
 			maxProposals = Integer.parseInt(properties.getProperty(MAX_PROPOSALS_KEY));
 
@@ -182,7 +199,22 @@ public class SystemConfiguration {
 		}
 		return parameters;
 	}
-
+	
+	public String getSrilmAnalyzerFilename() {
+		return srilmAnalyzerFilename;
+	}
+	
+	public int getNumberOfValidations() {
+		return numberOfValidations;
+	}
+	
+	public boolean usesSrilm() {
+		return srilm;
+	}
+	
+	public void loadAnalyzer(IAnalyzer analyzer) {
+		this.analyzer = analyzer;
+	}
 	
 	public Filter[] getFilters() {
 		return filters;
@@ -204,8 +236,8 @@ public class SystemConfiguration {
 		return modelFilename;
 	}
 
-	public String getAnalyzerFileName() {
-		return analyzerFilename;
+	public String getSerializedAnalyzerFileName() {
+		return serializedAnalyzerFilename;
 	}
 
 	public String getRepPath() {
@@ -259,8 +291,12 @@ public class SystemConfiguration {
 	}
 
 	public IAnalyzer getAnalyzer() {
-		if (analyzer == null)
-			analyzer = loadAnalyzerFromFile();
+		return getAnalyzer(serializedAnalyzerFilename);
+	}
+	
+	public IAnalyzer getAnalyzer(String filename){
+		if(analyzer == null)
+			analyzer = loadSerializedAnalyzerFromFile(filename);
 		return analyzer;
 	}
 
@@ -282,13 +318,13 @@ public class SystemConfiguration {
 		return resourcesFolderName + File.separator;
 	}
 
-	public IAnalyzer loadAnalyzerFromFile() {
+	private IAnalyzer loadSerializedAnalyzerFromFile(String filename) {
 
 		FileInputStream fis;
 		IAnalyzer analyzer = null;
 		try {
-			System.out.println(getResourceFolder() + analyzerFilename);
-			fis = new FileInputStream(new File(getResourceFolder() + analyzerFilename));
+			System.out.println(getResourceFolder() + filename);
+			fis = new FileInputStream(new File(getResourceFolder() + filename));
 			ObjectInputStream ois = new ObjectInputStream(fis);
 
 			analyzer = (IAnalyzer) ois.readObject();
@@ -299,5 +335,5 @@ public class SystemConfiguration {
 		}
 		return analyzer;
 	}
-
+	
 }

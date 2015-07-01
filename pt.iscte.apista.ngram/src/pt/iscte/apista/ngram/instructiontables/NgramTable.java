@@ -14,6 +14,7 @@ import pt.iscte.apista.ngram.InstructionWrapper;
 import pt.iscte.apista.ngram.NGramSentence;
 import pt.iscte.apista.ngram.UnigramTable;
 import pt.iscte.apista.ngram.interfaces.IInstructionTable;
+import pt.iscte.apista.ngram.models.NGramModel;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -21,16 +22,20 @@ import com.google.common.collect.Table.Cell;
 
 public class NgramTable extends IInstructionTable {
 
+	public NgramTable() {
+		super();
+	}
+	
 	@Override
 	public Table<Instruction, Instruction, InstructionInfo> buildTable(IAnalyzer analyzer, UnigramTable unigramTable) {
-		table = HashBasedTable.create();
+		
 
 		List<Instruction> startList = new ArrayList<>();
 		for (int i = 0; i < n - 1; i++) {
-			startList.add(Instruction.START);
+			startList.add(NGramModel.START);
 		}
 
-		table.put(Instruction.START, new InstructionSequence(startList, 0, n - 2),
+		table.put(NGramModel.START, new InstructionSequence(startList, 0, n - 2),
 				new InstructionInfo(analyzer.getSentences().size()));
 		List<Sentence> listSentences = analyzer.getSentences();
 		for (Sentence sentence : listSentences) {
@@ -40,7 +45,7 @@ public class NgramTable extends IInstructionTable {
 			for (int i = 0; i != list.size() - n + 1; i++) {
 
 				InstructionSequence is = new InstructionSequence(list, i + 1, Math.min(list.size() - 1, i + n - 1));
-
+				
 				if (table.contains(list.get(i), is)) {
 					table.get(list.get(i), is).addFrequency();
 				} else {
@@ -81,8 +86,8 @@ public class NgramTable extends IInstructionTable {
 		for (Instruction column : table.row(context.get(0)).keySet()) {
 
 			InstructionSequence sequence = (InstructionSequence) column;
-			if (sequence.startsWith(context, 1, context.size() - 1) && !sequence.getLast().equals(Instruction.END)
-					&& !sequence.getLast().equals(Instruction.UNK)) {
+			if (sequence.startsWith(context, 1, context.size() - 1) && !sequence.getLast().equals(NGramModel.END)
+					&& !sequence.getLast().equals(NGramModel.UNK)) {
 
 				double prob = table.get(context.get(0), column).getRelativeFrequency();
 

@@ -65,12 +65,38 @@ public abstract class AEvaluationMethod extends AEvaluator{
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Allows the model to be loaded according to the model defined by the SRILM and not deserialize it from the model's file.
+	 * Does not setup filters on the Analyzer, since it assumes the analyzer is already divided. 
+	 * @param modelFile model file to be loaded
+	 */
+	public void setupWithSRILM(File modelFile){
+		if(!configuration.usesSrilm())
+			throw new UnsupportedOperationException("The operation setupWithSRILM() on"
+					+ "AEvaluationMethod is not supported because the parameter "
+					+ "usesSRILM on the properties file is not configured");
+		else{
+			try {
+				configuration.getModel().setup(configuration.getModelParameters());
+				configuration.getModel().load(new FileInputStream(modelFile));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+	}
 
 	/**
 	 * returns the inverse of the testing filters, i.e. the training filters to build the model
 	 * @return returns an array with the inverse of the testing filters
 	 */
 	private Filter[] getInvertedFilters() {
+		if(filters == null || filters.length == 0){
+			throw new UnsupportedOperationException();
+		}
 		List<Filter> invertedFilters = new ArrayList<Filter>();
 		for (Filter filter : filters) {
 			Filter[] tempInv = filter.getInverseFilters();
@@ -95,7 +121,9 @@ public abstract class AEvaluationMethod extends AEvaluator{
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
 		Date date = new Date();
 		filenameData = dateFormat.format(date) + "_";
-		
+		if(configuration.getAnalyzer().getFilters() == null){
+			return filenameData += "nofilters";
+		}
 		for (Filter f : configuration.getAnalyzer().getFilters())
 			filenameData += f.toString();
 		

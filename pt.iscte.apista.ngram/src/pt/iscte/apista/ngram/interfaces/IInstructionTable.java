@@ -10,12 +10,17 @@ import pt.iscte.apista.ngram.InstructionInfo;
 import pt.iscte.apista.ngram.InstructionWrapper;
 import pt.iscte.apista.ngram.UnigramTable;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 public abstract class IInstructionTable implements Parametrizable, Serializable{
 	
 	protected int n;
 	protected Table<Instruction, Instruction, InstructionInfo> table;
+	
+	public IInstructionTable() {
+		table = HashBasedTable.create();
+	}
 	
 	@Override
 	public void setup(Parameters params) {

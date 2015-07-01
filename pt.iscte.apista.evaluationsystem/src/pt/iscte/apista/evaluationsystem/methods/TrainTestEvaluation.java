@@ -23,6 +23,9 @@ public class TrainTestEvaluation extends AEvaluationMethod {
 	}
 
 	private String getFiltersDescription(){
+		if(filters == null){
+			return "nofilters";
+		}
 		String s = "";
 		for (Filter f : filters) {
 			s += f.toString();

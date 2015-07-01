@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import pt.iscte.apista.core.Instruction;
+import pt.iscte.apista.ngram.models.NGramModel;
 
 import com.google.common.collect.ForwardingList;
 
@@ -27,13 +28,13 @@ public class NGramSentence extends ForwardingList<Instruction> {
 
 	public Instruction get(int index) {
 		if(index < n - 1)
-			return Instruction.START;
+			return NGramModel.START;
 		else if(index ==  size() - 1)
-			return Instruction.END;
+			return NGramModel.END;
 		else {
 			Instruction i = list.get(index-(n-1));
-			if(unigrams.isRare(i))
-				return Instruction.UNK;
+			if(unigrams != null && unigrams.isRare(i))
+				return NGramModel.UNK;
 			else
 				return i;
 		}
