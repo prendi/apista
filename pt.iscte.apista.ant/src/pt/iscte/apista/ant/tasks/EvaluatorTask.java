@@ -18,7 +18,7 @@ public class EvaluatorTask extends APISTATask{
 	public void execute(){
 //		//Must be called in order to initialize the configuration object
 		super.execute();
-
+		/*
 		try {
 			IAnalyzer analyzer = new Analyzer();
 			analyzer.loadAndSerializeAnalyzer(new File(configuration.getResourceFolder() + configuration.getSerializedAnalyzerFileName()), 
@@ -26,7 +26,7 @@ public class EvaluatorTask extends APISTATask{
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		//Makes a Train-Test Cross Validation to the model, and reports the data to the Results folder
 		CrossValidationTrainTestEvaluation cv = new CrossValidationTrainTestEvaluation(configuration);

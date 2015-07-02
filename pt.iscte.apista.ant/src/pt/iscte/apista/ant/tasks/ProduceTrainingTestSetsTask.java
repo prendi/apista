@@ -27,7 +27,7 @@ public class ProduceTrainingTestSetsTask extends APISTATask{
 			IAnalyzer analyzer = new Analyzer();
 			analyzer.loadSentences(new File(path));
 			analyzer.randomizeSentences(2015);
-			Filter[] filters = Range.getCrossValidationTestFilters(5);
+			Filter[] filters = Range.getCrossValidationTestFilters(configuration.getNumberOfValidations());
 
 			for (int i = 0; i != filters.length ; i++) {
 				writeAnalyzerPair(analyzer, filters[i],i+1);
@@ -56,6 +56,11 @@ public class ProduceTrainingTestSetsTask extends APISTATask{
 				}
 			}
 			bos.close();
+			analyzer.loadAndSerializeAnalyzer(new File(
+					configuration.getResourceFolder() + configuration.getSrilmAnalyzerFilename() + 
+					SystemConfiguration.ANALYZER_TEST_SUFFIX + f), 
+					new File(configuration.getResourceFolder() + configuration.getSerializedAnalyzerFileName() + 
+							SystemConfiguration.ANALYZER_TEST_SUFFIX + f));
 		} catch (IOException e) {
 			System.err.println("Problem writing test analyzer when producing pairs");
 			e.printStackTrace();
@@ -76,6 +81,11 @@ public class ProduceTrainingTestSetsTask extends APISTATask{
 				}
 			}
 			bos.close();
+			analyzer.loadAndSerializeAnalyzer(new File(
+					configuration.getResourceFolder() + configuration.getSrilmAnalyzerFilename() + 
+					SystemConfiguration.ANALYZER_TRAINING_SUFFIX+ f), 
+					new File(configuration.getResourceFolder() + configuration.getSerializedAnalyzerFileName() + 
+							SystemConfiguration.ANALYZER_TRAINING_SUFFIX + f));
 		}catch (IOException e) {
 			System.err.println("Problem writing training analyzer when producing pairs");
 			e.printStackTrace();

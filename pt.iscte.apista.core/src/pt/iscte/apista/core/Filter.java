@@ -47,7 +47,7 @@ public interface Filter {
 		public static Filter[] getCrossValidationTestFilters(int numberOfValidations){
 			Filter[] filters = new Filter[numberOfValidations];
 			double testPercentage = 1 / (double) (numberOfValidations);
-
+			
 			for (int i = 0; i != numberOfValidations; i++) {
 				double min = (double) i / (double) numberOfValidations;
 
@@ -62,6 +62,7 @@ public interface Filter {
 		public Filter[] getInverseFilters() {
 			//Temporary array with the inverse filters to be returned
 			Filter[] ranges;
+			
 			//If the minimum accepted value is 0, there will be only one filter which goes from the maximum accepted value to 1.
 			if (min == 0) {
 				ranges = new Filter[1];

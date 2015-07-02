@@ -64,6 +64,8 @@ public abstract class ACrossEvaluationMethod extends AEvaluator {
 					// Builds the model with the previous given configuration
 					evaluationMethod.runModel();
 					evaluationMethod.setup();
+					evaluationMethod.evaluate();
+					dataList.addAll(evaluationMethod.reportData());
 				} catch (Exception e) {   
 					System.err
 							.println("Error on the evaluate() method on class ACrossEvaluationMethod");
@@ -77,15 +79,17 @@ public abstract class ACrossEvaluationMethod extends AEvaluator {
 							.getDeclaredConstructor(SystemConfiguration.class,
 									Filter[].class).newInstance(configuration,null);
 					evaluationMethod.setupWithSRILM(new File(configuration.getResourceFolder() + configuration.getModelFileName()+(i+1)));
-					
+					configuration.setAnalyzer(configuration.getAnalyzer(
+							configuration.getResourceFolder() + configuration.getSerializedAnalyzerFileName()
+							+SystemConfiguration.ANALYZER_TEST_SUFFIX + (i+1)));
+					evaluationMethod.evaluate();
+					dataList.addAll(evaluationMethod.reportData());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
 			}
 		}
-		evaluationMethod.evaluate();
-		dataList.addAll(evaluationMethod.reportData());
 	}
 
 	protected final String getFilename() {

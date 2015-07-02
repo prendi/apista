@@ -342,7 +342,7 @@ public class Analyzer implements IAnalyzer, Serializable {
 		}
 
 	}
-
+	
 	@Override
 	public void run(SystemConfiguration configuration) {
 		try {
@@ -378,20 +378,21 @@ public class Analyzer implements IAnalyzer, Serializable {
 	}
 
 	@Override
-	public void loadAndSerializeAnalyzer(File loadFile, File outputfile) {
+	public  IAnalyzer loadAndSerializeAnalyzer(File loadFile, File outputfile) {
+		IAnalyzer analyzer = new Analyzer();
 		try {
-
-			loadSentences(loadFile);
+			analyzer.loadSentences(loadFile);
 			
 			ObjectOutputStream oos = new ObjectOutputStream(
 					new FileOutputStream(outputfile));
 
-			oos.writeObject(this);
+			oos.writeObject(analyzer);
 
 			oos.close();
 		} catch (IOException e) {
 			// TODO
 		}
+		return analyzer;
 	}
 
 }

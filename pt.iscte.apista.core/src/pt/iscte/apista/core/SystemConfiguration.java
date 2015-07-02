@@ -212,7 +212,7 @@ public class SystemConfiguration {
 		return srilm;
 	}
 	
-	public void loadAnalyzer(IAnalyzer analyzer) {
+	public void setAnalyzer(IAnalyzer analyzer) {
 		this.analyzer = analyzer;
 	}
 	
@@ -324,7 +324,7 @@ public class SystemConfiguration {
 		IAnalyzer analyzer = null;
 		try {
 			System.out.println(getResourceFolder() + filename);
-			fis = new FileInputStream(new File(getResourceFolder() + filename));
+			fis = new FileInputStream(new File(filename));
 			ObjectInputStream ois = new ObjectInputStream(fis);
 
 			analyzer = (IAnalyzer) ois.readObject();

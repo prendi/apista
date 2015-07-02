@@ -66,5 +66,5 @@ public interface IAnalyzer {
 	/**
 	 * Serializes the analyzer so it can be loaded afterwards for evaluation purposes
 	 */
-	void loadAndSerializeAnalyzer(File loadFile, File outputfile);
+	IAnalyzer loadAndSerializeAnalyzer(File loadFile, File outputfile);
 }
