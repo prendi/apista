@@ -3,24 +3,29 @@
               Any modifications will be overwritten.
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. --><project basedir="." default="build" name="pt.iscte.apista.evaluationsystem">
+              as the first entry and export the buildfile again. --><project basedir="." default="jar" name="pt.iscte.apista.evaluationsystem">
     <property environment="env"/>
-    <property name="ECLIPSE_HOME" value="C:/Program Files (x86)/eclipse plugin development/"/>
+    <property name="ECLIPSE_HOME" value="../../../Program Files (x86)/eclipse plugin development/"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
     <path id="Plug-in Dependencies.libraryclasspath">
-        <pathelement location="${ECLIPSE_HOME}plugins/com.google.guava_15.0.0.v201403281430.jar"/>
-        <pathelement location="../../../pt.iscte.apista.core"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.core_3.10.2.v20150120-1634.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/com.instantiations.assist.eclipse.fragment.jdt.core_7.1.0.r37x201109091135.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.apt_1.1.0.v20150122-0735.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.eclipse.jdt.compiler.tool_1.0.300.v20150114-1827.jar"/>
-        <pathelement location="../../../pt.iscte.apista.extractor"/>
-        <pathelement location="../../../pt.iscte.apista.ngram"/>
+        <pathelement location="../lib/pt.iscte.apista.core"/>
+        <pathelement location="../lib/pt.iscte.apista.extractor"/>
+        <pathelement location="../lib/pt.iscte.apista.ngram"/>
+    </path>
+    <path id="main.extlibs.class.path">
+        <fileset dir="${ECLIPSE_HOME}/plugins">
+            <include name="**/com.google.guava*.jar"/>
+            <include name="**/org.eclipse.jdt.core*.jar"/>
+            <include name="**/com.instantiations.assist.eclipse.fragment.jdt.core*.jar"/>
+            <include name="**/org.eclipse.jdt.compiler.apt*.jar"/>
+            <include name="**/org.eclipse.jdt.compiler.tool*.jar"/>
+        </fileset>
     </path>
     <path id="pt.iscte.apista.evaluationsystem.classpath">
         <path refid="Plug-in Dependencies.libraryclasspath"/>
+        <path refid="main.extlibs.class.path"/>
         <pathelement location="bin"/>
     </path>
     <target name="init">
@@ -46,10 +51,7 @@
             <classpath refid="pt.iscte.apista.evaluationsystem.classpath"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target name="Evaluator">
-        <java classname="pt.iscte.apista.evaluationsystem.Evaluator" failonerror="true" fork="yes">
-            <classpath refid="pt.iscte.apista.evaluationsystem.classpath"/>
-        </java>
+    <target name="jar" description="JARs the Task" depends="build">
+        <jar destfile="../lib/${ant.project.name}.jar" basedir="./bin"/>
     </target>
 </project>

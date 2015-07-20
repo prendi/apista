@@ -141,4 +141,16 @@
         </taskdef>
         <go/>
     </target>
+
+       <target name="produce" description="Use the Task" depends="jar">
+        <echo message="Using properties file: ${propertiesPath}" />
+        <taskdef name="go" classname="pt.iscte.apista.ant.tasks.ProduceSetsTask">
+                         <classpath>
+                    <path refid="Plug-in Dependencies.libraryclasspath"/>
+                    <path refid="main.extlibs.class.path"/>
+             </classpath>
+        </taskdef>
+        <go/>
+    </target>
+
 </project>

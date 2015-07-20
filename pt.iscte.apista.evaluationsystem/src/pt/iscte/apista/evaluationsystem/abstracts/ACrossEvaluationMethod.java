@@ -85,7 +85,7 @@ public abstract class ACrossEvaluationMethod extends AEvaluator {
 					evaluationMethod.evaluate();
 					dataList.addAll(evaluationMethod.reportData());
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					System.err.println("Error configuring evaluation system on class ACrossEvaluation " + e.getMessage());
 					e.printStackTrace();
 				} 
 			}

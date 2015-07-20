@@ -5,15 +5,12 @@
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. --><project basedir="." default="jar" name="pt.iscte.apista.core">
     <property environment="env"/>
-    <property name="ECLIPSE_HOME" value="C:/Program Files (x86)/eclipse plugin development/"/>
+    <property name="ECLIPSE_HOME" value="../../../Program Files (x86)/eclipse plugin development/"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
-    <path id="Plug-in Dependencies.libraryclasspath">
-        
-    </path>
-     <path id="main.extlibs.class.path">
-        <fileset dir="$**">
+    <path id="main.extlibs.class.path">
+        <fileset dir="${ECLIPSE_HOME}/plugins">
         <include name="**/org.eclipse.jdt.core*.jar"/>
         <include name="**/com.instantiations.assist.eclipse.fragment.jdt.core*.jar"/>
         <include name="**/org.eclipse.jdt.compiler.apt*.jar"/>
@@ -30,11 +27,11 @@
         <include name="**/org.eclipse.equinox.preferences*.jar"/>
         <include name="**/org.eclipse.core.contenttype*.jar"/>
         <include name="**/org.eclipse.equinox.app*.jar"/>
-    </fileset>
+    
+        </fileset>
     </path>
-
     <path id="pt.iscte.apista.core.classpath">
-        <path refid="Plug-in Dependencies.libraryclasspath"/>
+        <path refid="main.extlibs.class.path"/>
         <pathelement location="bin"/>
     </path>
     <target name="init">
@@ -57,14 +54,11 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
-            <classpath>
-                    <path refid="Plug-in Dependencies.libraryclasspath"/>
-                    <path refid="main.extlibs.class.path"/>
-             </classpath>
+            <classpath refid="pt.iscte.apista.core.classpath"/>
         </javac>
     </target>
-        <target name="jar" description="JARs the Task" depends="build">
+
+    <target name="jar" description="JARs the Task" depends="build">
         <jar destfile="../lib/${ant.project.name}.jar" basedir="./bin"/>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
 </project>

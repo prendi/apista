@@ -15,7 +15,12 @@ import pt.iscte.apista.core.Filter.Range;
 import pt.iscte.apista.core.Sentence;
 import pt.iscte.apista.extractor.Analyzer;
 
-public class ProduceTrainingTestSetsTask extends APISTATask{
+/**
+ * Produces training and test sets with the Analyzer provided. The analyzer should be in SRILM format for compatibility.
+ * @author Gonçalo
+ *
+ */
+public class ProduceSetsTask extends APISTATask{
 
 	@Override
 	public void execute() {
@@ -33,7 +38,7 @@ public class ProduceTrainingTestSetsTask extends APISTATask{
 				writeAnalyzerPair(analyzer, filters[i],i+1);
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Error loading Analyzer from file " + configuration.getSrilmAnalyzerFilename());
 			e.printStackTrace();
 		}
 		
@@ -90,9 +95,6 @@ public class ProduceTrainingTestSetsTask extends APISTATask{
 			System.err.println("Problem writing training analyzer when producing pairs");
 			e.printStackTrace();
 		}
-	}
-	public static void main(String[] args) {
-		new ProduceTrainingTestSetsTask().execute();
 	}
 	
 }
