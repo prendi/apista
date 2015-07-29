@@ -53,8 +53,7 @@ public abstract class AEvaluationMethod extends AEvaluator{
 
 			File modelFile = new File(configuration.getResourceFolder() + configuration.getModelFileName());
 			if (modelFile.exists()) {
-				FileInputStream stream = new FileInputStream(modelFile);
-				configuration.getModel().load(stream);
+				configuration.getModel().load(new FileInputStream(modelFile));
 			}else{
 				throw new FileNotFoundException("Model file was not found when setting up the evaluation system");
 			}
@@ -79,7 +78,7 @@ public abstract class AEvaluationMethod extends AEvaluator{
 		else{
 			try {
 				configuration.getModel().setup(configuration.getModelParameters());
-				configuration.getModel().load(new FileInputStream(modelFile));
+				configuration.getModel().load(modelFile);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -1,0 +1,36 @@
+<project name="apista" basedir="." default="all">
+
+<target name="all" depends="apista.ant,apista.core,apista.eclipse
+	,apista.evaluationsystem,apista.extractor,apista.integration
+	,apista.ngram" />
+
+<target name="apista.ant">
+    <ant dir="./pt.iscte.apista.ant" target="jar" />        
+</target>
+
+<target name="apista.core">
+    <ant dir="./pt.iscte.apista.core" target="jar" />        
+</target>
+
+<target name="apista.eclipse">
+    <ant dir="./pt.iscte.apista.eclipse" target="jar" />        
+</target>
+
+<target name="apista.evaluationsystem">
+    <ant dir="./pt.iscte.apista.evaluationsystem" target="jar" />        
+</target>
+
+<target name="apista.extractor">
+    <ant dir="./pt.iscte.apista.extractor" target="jar" />        
+</target>
+
+<target name="apista.integration">
+    <ant dir="./pt.iscte.apista.integration" target="jar" />        
+</target>
+
+<target name="apista.ngram">
+    <ant dir="./pt.iscte.apista.ngram" target="jar" />        
+</target>
+
+</project>
+

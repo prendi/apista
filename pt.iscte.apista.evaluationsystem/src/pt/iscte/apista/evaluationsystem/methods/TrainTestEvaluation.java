@@ -48,13 +48,13 @@ public class TrainTestEvaluation extends AEvaluationMethod {
 				List<Instruction> proposals;
 
 				if (sentence.getInstructions().size() > 1) {
-
+					
 					for (int i = 0; i != sentence.getInstructions().size(); i++) {
 						context.add(sentence.getInstructions().get(i));
 						proposals = configuration.getModel().query(context,
 								configuration.getMaxProposals());
 
-						if (i + 1 < sentence.getInstructions().size()) {
+						if (i +1 < sentence.getInstructions().size()) {
 							Instruction nextInstruction = sentence
 									.getInstructions().get(i + 1);
 							
@@ -87,7 +87,7 @@ public class TrainTestEvaluation extends AEvaluationMethod {
 //
 //		}
 		
-		if (index >= 0 && index <= configuration.getMaxProposals()) {
+		if (index >= 0 && index < configuration.getMaxProposals()) {
 			data.addProposedToIndex(index);
 			return true;
 		} else {

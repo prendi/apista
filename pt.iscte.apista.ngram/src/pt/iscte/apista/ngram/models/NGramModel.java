@@ -1,6 +1,7 @@
 package pt.iscte.apista.ngram.models;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,10 +40,12 @@ public class NGramModel implements APIModel, Serializable {
 	private int n;
 
 	private UnigramTable unigramTable;
-	private IInstructionTable instructionTable = new NgramTable();
+	private IInstructionTable instructionTable;
 
 	@Override
 	public void setup(Parameters params) {
+		instructionTable = new NgramTable();
+		instructionTable.setup(params);
 		n = params.getIntValue("n");
 	}
 
@@ -50,11 +53,6 @@ public class NGramModel implements APIModel, Serializable {
 	public void build(IAnalyzer analyzer) {
 
 		unigramTable = new UnigramTable(analyzer);
-
-		Parameters params = new Parameters();
-		params.addParameter("n", "" + n);
-
-		instructionTable.setup(params);
 
 		instructionTable.buildTable(analyzer, unigramTable);
 
@@ -71,7 +69,11 @@ public class NGramModel implements APIModel, Serializable {
 		Reporter.reportFrequencyTable(instructionTable.getTable());
 		oos.close();
 	}
-
+	
+	@Override
+	public void load(File file) throws IOException {
+		load(new FileInputStream(file));
+	}
 
 	@Override
 	public void load(InputStream stream) throws IOException {
@@ -79,11 +81,11 @@ public class NGramModel implements APIModel, Serializable {
 		Scanner s = null;
 		try {
 			s = new Scanner(stream);
-			boolean found3Gram = false;
-			while (s.hasNext() && !found3Gram) {
+			boolean foundNGram = false;
+			while (s.hasNext() && !foundNGram) {
 				String temp = s.nextLine();
 				if (temp.contains(n+"-grams:")) {
-					found3Gram = true;
+					foundNGram = true;
 				}
 			}
 			String nextline;
@@ -104,11 +106,13 @@ public class NGramModel implements APIModel, Serializable {
 					}
 				}
 				InstructionSequence is = new InstructionSequence(list, 1, list.size()-1);
-				System.out.println(instructionTable.getTable().put(list.get(0), is, new InstructionInfo(probability)));
+//				System.out.println("TABLE SIZE: " + instructionTable.getTable().size());
+				instructionTable.getTable().put(list.get(0), is, new InstructionInfo(probability));
 			}
 		} finally {
-			if(s != null)
+			if(s!= null)
 				s.close();
+			System.out.println("TABLE SIZE: " + instructionTable.getTable().size());
 		}
 //		ObjectInputStream ois = new ObjectInputStream(stream);
 //		try {
@@ -144,6 +148,10 @@ public class NGramModel implements APIModel, Serializable {
 
 		double prob = instructionTable.probability(instruction, ngs.tail());
 		return prob == 0.0 ? unigramTable.rareFrequency() : prob;
+	}
+	
+	public IInstructionTable getInstructionTable() {
+		return instructionTable;
 	}
 	
 	private static class SentenceStart extends Instruction {
@@ -194,5 +202,8 @@ public class NGramModel implements APIModel, Serializable {
 			throw new UnsupportedOperationException();
 		}	
 	}
+
+
+
 
 }

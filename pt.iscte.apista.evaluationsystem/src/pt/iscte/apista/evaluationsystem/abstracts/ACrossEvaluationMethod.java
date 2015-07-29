@@ -79,9 +79,11 @@ public abstract class ACrossEvaluationMethod extends AEvaluator {
 							.getDeclaredConstructor(SystemConfiguration.class,
 									Filter[].class).newInstance(configuration,null);
 					evaluationMethod.setupWithSRILM(new File(configuration.getResourceFolder() + configuration.getModelFileName()+(i+1)));
-					configuration.setAnalyzer(configuration.getAnalyzer(
-							configuration.getResourceFolder() + configuration.getSerializedAnalyzerFileName()
+					configuration.setAnalyzer(configuration.getAnalyzer(configuration.getSerializedAnalyzerFileName()
 							+SystemConfiguration.ANALYZER_TEST_SUFFIX + (i+1)));
+					System.out.println(configuration.getResourceFolder() + configuration.getModelFileName()+(i+1));
+					System.out.println(configuration.getResourceFolder() + configuration.getSerializedAnalyzerFileName()
+							+SystemConfiguration.ANALYZER_TEST_SUFFIX + (i+1));
 					evaluationMethod.evaluate();
 					dataList.addAll(evaluationMethod.reportData());
 				} catch (Exception e) {
@@ -103,7 +105,7 @@ public abstract class ACrossEvaluationMethod extends AEvaluator {
 	protected final String getFilenameData() {
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
 		Date date = new Date();
-		return dateFormat.format(date) + "_";
+		return dateFormat.format(date) + "_" + configuration.getOutputFileName() + "_" +configuration.getModelParameters();
 	}
 
 }

@@ -18,10 +18,15 @@ public interface APIModel extends Parametrizable{
 	void save(File file) throws IOException;
 
 	/**
+	 * Loads the model from the Stream
+	 */
+	void load(InputStream stream) throws IOException;
+
+	/**
 	 * Loads the model from the file
 	 */
-	void load(InputStream file) throws IOException;
-
+	void load(File file) throws IOException;
+	
 	/**
 	 * Return a list of instruction proposals (with max size), given the list of previous instructions (context)
 	 */

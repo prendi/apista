@@ -133,7 +133,7 @@ public class SystemConfiguration {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private Filter[] convertRawFilters(String[] rawFilters) {
 		Filter[] filters = new Filter.Range[rawFilters.length];
 		
@@ -291,12 +291,13 @@ public class SystemConfiguration {
 	}
 
 	public IAnalyzer getAnalyzer() {
-		return getAnalyzer(serializedAnalyzerFilename);
+		if(analyzer == null)
+			return getAnalyzer(serializedAnalyzerFilename);
+		return analyzer;
 	}
 	
 	public IAnalyzer getAnalyzer(String filename){
-		if(analyzer == null)
-			analyzer = loadSerializedAnalyzerFromFile(filename);
+		analyzer = loadSerializedAnalyzerFromFile(filename);
 		return analyzer;
 	}
 
@@ -324,7 +325,7 @@ public class SystemConfiguration {
 		IAnalyzer analyzer = null;
 		try {
 			System.out.println(getResourceFolder() + filename);
-			fis = new FileInputStream(new File(filename));
+			fis = new FileInputStream(new File(getResourceFolder() +filename));
 			ObjectInputStream ois = new ObjectInputStream(fis);
 
 			analyzer = (IAnalyzer) ois.readObject();

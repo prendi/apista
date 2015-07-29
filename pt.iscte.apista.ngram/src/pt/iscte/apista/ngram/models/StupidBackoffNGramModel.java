@@ -40,15 +40,16 @@ public class StupidBackoffNGramModel implements APIModel, Serializable {
 
 	@Override
 	public void build(IAnalyzer analyzer) {
+
 		unigramTable = new UnigramTable(analyzer);
 
 		for (int n = maxNgramSize; n >= minNgramSize; n--) {
 
 			IInstructionTable instructionTable = new NgramTable();
-			
+
 			Parameters params = new Parameters();
-			params.addParameter("n", ""+n);
-			
+			params.addParameter("n", "" + n);
+
 			instructionTable.setup(params);
 			instructionTable.buildTable(analyzer, unigramTable);
 			instructionTable.calculateFrequency();
@@ -69,9 +70,24 @@ public class StupidBackoffNGramModel implements APIModel, Serializable {
 
 	}
 
+	@Override
+	public void load(File file) throws IOException {
+		NGramModel model = new NGramModel();
+		for (int n = minNgramSize; n <= maxNgramSize; n++) {
+			Parameters params = new Parameters();
+			params.addParameter("n", "" + n);
+			model.setup(params);
+			FileInputStream fis = new FileInputStream(file);
+			model.load(fis);
+			fis.close();
+			models.add(model.getInstructionTable());
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void load(InputStream stream) throws IOException {
+
 		ObjectInputStream ois = new ObjectInputStream(stream);
 		try {
 			models = (List<IInstructionTable>) ois.readObject();
@@ -81,20 +97,39 @@ public class StupidBackoffNGramModel implements APIModel, Serializable {
 		} finally {
 			ois.close();
 		}
-
 	}
 
 	@Override
 	public List<Instruction> query(List<Instruction> context, int max) {
 		List<InstructionWrapper> proposals = new ArrayList<>();
-		stupidBackoff(proposals, context, 0, maxNgramSize);
-
+		// stupidBackoff(proposals, context, 0, maxNgramSize);
+		normalBackoff(proposals, context, maxNgramSize - minNgramSize,
+				maxNgramSize);
 		return convertFromWrapperToList(proposals);
+	}
+
+	private void normalBackoff(List<InstructionWrapper> proposals,
+			List<Instruction> context, int level, int n) {
+		if (context.size() < n - 1) {
+			normalBackoff(proposals, context, level - 1, n - 1);
+		} else {
+			NGramSentence ngs = new NGramSentence(n, context, unigramTable);
+			IInstructionTable model = models.get(level);
+
+			List<InstructionWrapper> levelProposals = model
+					.queryFrequencyTable(ngs.tail(), 200);
+			for (InstructionWrapper iw : levelProposals) {
+				if (!hasInstruction(proposals, iw)) {
+					iw.setrFrequency(iw.getrFrequency()
+							* Math.pow(stupidBackoffMultiplier, level));
+					proposals.add(iw);
+				}
+			}
+		}
 	}
 
 	private void stupidBackoff(List<InstructionWrapper> proposals,
 			List<Instruction> context, int level, int n) {
-
 		NGramSentence ngs = new NGramSentence(n, context, unigramTable);
 		IInstructionTable model = models.get(level);
 
@@ -165,5 +200,4 @@ public class StupidBackoffNGramModel implements APIModel, Serializable {
 		return returnList;
 
 	}
-
 }

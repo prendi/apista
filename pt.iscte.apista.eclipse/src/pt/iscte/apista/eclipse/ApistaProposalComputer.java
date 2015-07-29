@@ -102,7 +102,7 @@ public class ApistaProposalComputer implements IJavaCompletionProposalComputer, 
 					APIModel model = (APIModel) api.createExecutableExtension("model");
 					model.setup(conf.getModelParameters());
 					model.load(modelInputStream);
-
+					modelInputStream.close();
 					String iconFile = api.getAttribute("icon");
 					Image icon = null;
 					if(!iconFile.isEmpty()) {

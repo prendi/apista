@@ -45,7 +45,7 @@ public class ModelBuilder {
 		
 		APIModel model = configuration.getModel();
 		
-		model.load(new FileInputStream(modelFile));
+		model.load(modelFile);
 		
 		//Save the model to a file
 		File output = new File(configuration.getResourceFolder()+configuration.getOutputFileName());
