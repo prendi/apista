@@ -160,6 +160,7 @@ public class Analyzer implements IAnalyzer, Serializable {
 		nFiles = 0;
 		parse(new File(repositoryRoot), libSrcRoot);
 		time = (System.currentTimeMillis() - t) / 1000;
+		System.out.println("FILES PROCESSED: " + nFiles);
 		System.out.println("FILES FAILED: " + numberOfFilesFailed);
 	}
 
