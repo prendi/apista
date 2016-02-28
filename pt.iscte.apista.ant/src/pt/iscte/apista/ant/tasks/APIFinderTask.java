@@ -1,21 +1,22 @@
 package pt.iscte.apista.ant.tasks;
 
-//import java.io.File;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.io.File;
-
-import org.apache.tools.ant.taskdefs.optional.ssh.Directory;
-import org.apache.tools.ant.util.FileUtils;
 
 import pt.iscte.apista.ant.APISTATask;
 
@@ -41,25 +42,19 @@ public class APIFinderTask extends APISTATask {
 
 		// Writes the project's folder absolute path to a file called
 		// "results.txt" in the Resources Folder
-		PrintWriter pw = null;
-		try {
+        	try (PrintWriter pw = new PrintWriter(new File(configuration.getOutputFolder() + "results.txt"))) {
 			System.out.println("PROJECTS FOUND: " + set.size());
-			pw = new PrintWriter(new File(configuration.getOutputFolder()
-					+ "results.txt"));
 			for (String s : set) {
 				pw.write(s + "\n");
-//				System.out.println(Paths.get(s).getParent());
-//				System.out.println(Paths.get(configuration.getTargetPath()));
-				Files.walkFileTree(Paths.get(s), new CopyDirVisitor(Paths.get(configuration.getRepPath()),Paths.get(configuration.getTargetPath())));
-			}
+                		try {
+                			Files.walkFileTree(Paths.get(s), new CopyDirVisitor(Paths.get(configuration.getRepPath()),Paths.get(configuration.getTargetPath())));
+ 		        	} catch (IOException ex) {
+ 		        		System.out.println("Failed to copy project: " + s);
+                		}
+            		}
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			pw.close();
+			System.out.println("There was a problem opening the writer" + e);
 		}
-
-		System.out.println(apiUsage);
-
 	}
 
 	private class CopyDirVisitor extends SimpleFileVisitor<Path> {
