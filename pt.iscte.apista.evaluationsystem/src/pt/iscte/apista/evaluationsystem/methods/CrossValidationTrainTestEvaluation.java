@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import pt.iscte.apista.core.SystemConfiguration;
@@ -55,13 +56,13 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 			for (int i = 0; i != maxProposals; i++) {
 				bw.write("" + (i + 1));
 				bw.write(",");
-				bw.write("" + (indexes[i] / (double) dataList.size()));
-				bw.write(",");
-				bw.write("" + (indexPercentage[i] / (double) dataList.size()));
-				bw.write(",");
+				//bw.write("" + (indexes[i] / (double) dataList.size()));
+				//bw.write(",");
+				//bw.write("" + (indexPercentage[i] / (double) dataList.size()));
+				//bw.write(",");
 				bw.write(""
-						+ (indexComulativePercentage[i] / (double) dataList
-								.size()));
+						+ new DecimalFormat("#.00").format((indexComulativePercentage[i] / (double) dataList
+								.size())));
 				bw.write("\n");
 			}
 			bw.write("Average of Total Proposed, " + totalProposed
