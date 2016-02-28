@@ -17,7 +17,7 @@ import pt.iscte.apista.extractor.Analyzer;
 
 /**
  * Produces training and test sets with the Analyzer provided. The analyzer should be in SRILM format for compatibility.
- * @author Gonçalo
+ * @author Goncalo
  *
  */
 public class ProduceSetsTask extends APISTATask{
