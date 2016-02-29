@@ -1,8 +1,10 @@
 package pt.iscte.apista.evaluationsystem.methods;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 
+import pt.iscte.apista.core.SystemConfiguration;
 import pt.iscte.apista.evaluationsystem.EvaluationData;
 
 public class Quartiles {
@@ -88,6 +90,8 @@ public class Quartiles {
 		int[] indexesPlusOne = Arrays.copyOf(data.getIndexes(), data.getIndexes().length + 1);
 		indexesPlusOne[indexesPlusOne.length-1] = data.getTotalNotProposed();
 		double[] unroll = unroll(indexesPlusOne);
+		for (int i = 0 ; i != unroll.length; i++)
+			System.out.println(unroll[i]);
 		q1 = q1(unroll);
 		q2 = median(unroll);
 		q3 = q3(unroll);
@@ -160,6 +164,12 @@ public class Quartiles {
 	}
 
 	public static void main(String[] args) {
+		SystemConfiguration configuration = new SystemConfiguration("../pt.iscte.apista.resources/configJackson.properties");
+		CrossValidationTokenPrecisionMedian cvtpm = new CrossValidationTokenPrecisionMedian(configuration);
+		cvtpm.evaluate();
+		cvtpm.reportData();
+		
+		/*
 		int[] counts = {2,3,2,4};
 		System.out.println(Arrays.toString(unroll(counts)));
 		double[] v1 = {1,2,2,4,5, 6,6,8,9,9};
@@ -173,5 +183,8 @@ public class Quartiles {
 
 		double[] v2b = {1,2,3,3,4,5, 6, 7,8,9,10,10,11};
 		System.out.println(q1(v2b) + "\t" + median(v2b) + "\t" + q3(v2b));
+		*/
+		double[] v3b = {2, 2, 2, 2, 1};
+		System.out.println(q1(v3b) + "\t" + median(v3b) + "\t" + q3(v3b));
 	}
 }
