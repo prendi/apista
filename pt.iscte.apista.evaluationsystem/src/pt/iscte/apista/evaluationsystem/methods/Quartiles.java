@@ -1,10 +1,8 @@
 package pt.iscte.apista.evaluationsystem.methods;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 
-import pt.iscte.apista.core.SystemConfiguration;
 import pt.iscte.apista.evaluationsystem.EvaluationData;
 
 public class Quartiles {
@@ -87,9 +85,10 @@ public class Quartiles {
 	}
 
 	private void setQuartiles(EvaluationData data) {
-		int[] indexesPlusOne = Arrays.copyOf(data.getIndexes(), data.getIndexes().length + 1);
-		indexesPlusOne[indexesPlusOne.length-1] = data.getTotalNotProposed();
-		double[] unroll = unroll(indexesPlusOne);
+//		int[] indexesPlusOne = Arrays.copyOf(data.getIndexes(), data.getIndexes().length + 1);
+//		indexesPlusOne[indexesPlusOne.length-1] = data.getTotalNotProposed();
+//		double[] unroll = unroll(indexesPlusOne);
+		double[] unroll = unroll(data.getIndexes());
 		for (int i = 0 ; i != unroll.length; i++)
 			System.out.println(unroll[i]);
 		q1 = q1(unroll);
@@ -115,45 +114,45 @@ public class Quartiles {
 		return unroll;
 	}
 
-	//	private static double[] quartiles(List<EvaluationData> data) {
-	//		int[] mergedIndexes = new int[data.get(0).getMaxProposals() + 1];
-	//		for (EvaluationData set : data) {
-	//			int[] indexes = set.getIndexes();
-	//			for(int i = 0; i < mergedIndexes.length; i++) {
-	//				mergedIndexes[i] += indexes[i];
-	//			}
-	//			// last vector position contains the total count of not proposed
-	//			mergedIndexes[mergedIndexes.length-1] += set.getTotalNotProposed();
-	//		}
-	//
-	//		int[] unroll = unroll(mergedIndexes);
-	//
-	//		return new double[] {q1(unroll),median(unroll),q3(unroll)};
-	//	}
-
-
-
 	private static double q1(double[] v) {
-		return median(0, (v.length / 2) - 1, v);
+		if(v.length == 0)
+			throw new IllegalArgumentException("zero-length array");
+		else if(v.length == 1)
+			return v[0];
+
+		return median(0, (v.length / 2)-1, v);
 	}
 
 	private static double median(double[] v) {
+		if(v.length == 0)
+			throw new IllegalArgumentException("zero-length array");
+		else if(v.length == 1)
+			return v[0];
+		
 		return median(0, v.length-1, v);	
 	}
 
 	private static double q3(double[] v) {
-		int i = v.length % 2 == 0 ? v.length / 2 : (v.length / 2) + 1;
+		if(v.length == 0)
+			throw new IllegalArgumentException("zero-length array");
+		else if(v.length == 1)
+			return v[0];
+		
+		int i = v.length % 2 == 0 ? v.length / 2 : (Math.round(v.length / 2)) + 1;
 		return median(i, v.length-1, v);
 	}
 
 	private static double median(int i, int j, double[] v) {
+		assert v.length > 1 && i <= j;
 		int len = j - i + 1;
-		int h  = i + len/2;
-		return len % 2 == 0 ? (v[h] + v[h-1]) / 2.0 : v[h];
+		int h  = len/2;
+		return len % 2 == 0 ? (v[i + h] + v[i + h - 1]) / 2.0 : v[i + h];
 	}
 	
 	private static double percentile(double[] v, double p) {
-		return v[(int) Math.round(v.length*p)];
+		assert p >= 0.0 && p <= 1.0;
+		int i = (int) ((v.length-1)*p);
+		return v[i];
 	}
 
 	private static int sum(int[] v) {
@@ -164,10 +163,10 @@ public class Quartiles {
 	}
 
 	public static void main(String[] args) {
-		SystemConfiguration configuration = new SystemConfiguration("../pt.iscte.apista.resources/configJackson.properties");
-		CrossValidationTokenPrecisionMedian cvtpm = new CrossValidationTokenPrecisionMedian(configuration);
-		cvtpm.evaluate();
-		cvtpm.reportData();
+//		SystemConfiguration configuration = new SystemConfiguration("../pt.iscte.apista.resources/configJackson.properties");
+//		CrossValidationTokenPrecisionMedian cvtpm = new CrossValidationTokenPrecisionMedian(configuration);
+//		cvtpm.evaluate();
+//		cvtpm.reportData();
 		
 		/*
 		int[] counts = {2,3,2,4};
@@ -184,7 +183,14 @@ public class Quartiles {
 		double[] v2b = {1,2,3,3,4,5, 6, 7,8,9,10,10,11};
 		System.out.println(q1(v2b) + "\t" + median(v2b) + "\t" + q3(v2b));
 		*/
-		double[] v3b = {2, 2, 2, 2, 1};
+		double[] v2b = {2};
+		double[] v3b = {2, 2, 3, 3, 4, 6, 7, 6};
+//		median(v2b);
 		System.out.println(q1(v3b) + "\t" + median(v3b) + "\t" + q3(v3b));
+		
+		System.out.println(percentile(v3b,.25) + "\t" + percentile(v3b,.5) + "\t" + percentile(v3b,.75));
+		
+//		for(double p = 0; p <= 1.0; p+= .05)
+//			System.out.println(percentile(v3b, p));
 	}
 }
