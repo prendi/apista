@@ -4,7 +4,7 @@
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. --><project basedir="." default="jar" name="pt.iscte.apista.ant">
-    <property name="ECLIPSE_HOME" value="../../../Program Files (x86)/eclipse plugin development/"/>
+    <property name="ECLIPSE_HOME" value="/home/goncalo/Applications/eclipse"/>
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
@@ -72,8 +72,8 @@
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
-            <compilerarg line="-Xms3072M -Xmx3072M -XX:MaxPermSize=3072M"/>
+	<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}"
+		memoryMaximumSize="2048m">
             <src path="src"/>
             <classpath>
                     <path refid="Plug-in Dependencies.libraryclasspath"/>
