@@ -35,6 +35,8 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 			/*bw.write("sep=,"+ "\n");
 			bw.write("Index, Average Number Of Proposals, Average Cover Percentage, Average Cumulative Percentage Cover \n");
 			*/
+			//bw.write("sep=,"+ "\n");
+			//bw.write("Index, Average Number Of Proposals, Average Cover Percentage, Average Cumulative Percentage Cover \n");
 			
 			for (EvaluationData data : dataList) {
 				
@@ -61,8 +63,8 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 				//bw.write("" + (indexPercentage[i] / (double) dataList.size()));
 				//bw.write(",");
 				bw.write(" "
-						+ new DecimalFormat("#.00").format((indexComulativePercentage[i] / (double) dataList
-								.size()) * 100));
+						+ new DecimalFormat("###.00").format((indexComulativePercentage[i] / (double) dataList
+								.size())*100));
 				bw.write("\n");
 			}
 			/*bw.write("Average of Total Proposed, " + totalProposed
