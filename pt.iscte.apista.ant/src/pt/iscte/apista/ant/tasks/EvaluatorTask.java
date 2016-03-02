@@ -30,9 +30,9 @@ public class EvaluatorTask extends APISTATask{
 		}*/
 		
 		//Makes a Train-Test Cross Validation to the model, and reports the data to the Results folder
-	//	CrossValidationTrainTestEvaluation cv = new CrossValidationTrainTestEvaluation(configuration);
-	//	cv.evaluate();
-	//	cv.reportData();
+		CrossValidationTrainTestEvaluation cv = new CrossValidationTrainTestEvaluation(configuration);
+		cv.evaluate();
+		cv.reportData();
 //		
 //		//Makes a Token Cross Validation with the model provided, and reports the data to the Results folder
 	//	CrossValidationTokenPrecision tpcv = new CrossValidationTokenPrecision(configuration);

@@ -81,7 +81,7 @@ public class CrossValidationTokenPrecisionMedian extends ACrossEvaluationMethod 
 			out.println("% " + 
 					dateFormat.format(new Date()) + " " + 
 					configuration.getLibRootPackage() + " " + 
-					configuration.getModelParameters().getIntValue("n") + "-gram");
+					configuration.getModelParameters().getIntValue("nmax") + "-gram");
 			
 			out.println(
 				medQuartiles.getPercentile(10) + "\t" +

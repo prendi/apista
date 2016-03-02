@@ -32,9 +32,9 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 		try {
 
 			bw = new BufferedWriter(new FileWriter(dataFile));
-			bw.write("sep=,"+ "\n");
+			/*bw.write("sep=,"+ "\n");
 			bw.write("Index, Average Number Of Proposals, Average Cover Percentage, Average Cumulative Percentage Cover \n");
-			
+			*/
 			
 			for (EvaluationData data : dataList) {
 				
@@ -55,17 +55,17 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 
 			for (int i = 0; i != maxProposals; i++) {
 				bw.write("" + (i + 1));
-				bw.write(",");
+//				bw.write(",");
 				//bw.write("" + (indexes[i] / (double) dataList.size()));
 				//bw.write(",");
 				//bw.write("" + (indexPercentage[i] / (double) dataList.size()));
 				//bw.write(",");
-				bw.write(""
+				bw.write(" "
 						+ new DecimalFormat("#.00").format((indexComulativePercentage[i] / (double) dataList
-								.size())));
+								.size()) * 100));
 				bw.write("\n");
 			}
-			bw.write("Average of Total Proposed, " + totalProposed
+			/*bw.write("Average of Total Proposed, " + totalProposed
 					/ (double) dataList.size() + " \n");
 			bw.write("Average of Total Not Proposed, " + totalNotProposed
 					/ (double) dataList.size() + "\n");
@@ -74,6 +74,7 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 			bw.write("Average Percentage of Total Not Proposed, "
 					+ totalNotProposedPercentage / (double) dataList.size()
 					+ "\n");
+			*/
 			bw.flush();
 			bw.close();
 
@@ -82,7 +83,7 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 					.println("Problem creating report file on CrossValidation.class - reportData()");
 		}
 
-		File chartCoordinateFile = new File(getFilename() + ".txt");
+		/*File chartCoordinateFile = new File(getFilename() + ".txt");
 		BufferedWriter bwChartCoordinates;
 		try {
 
@@ -100,11 +101,12 @@ public class CrossValidationTrainTestEvaluation extends ACrossEvaluationMethod {
 			
 			bwChartCoordinates.flush();
 			bwChartCoordinates.close();
+		
 		}catch (IOException e1) {
 				System.err
 						.println("Problem creating report file on CrossValidation.class - reportData()");
 			}
-		
+		*/
 		return null;
 	}
 

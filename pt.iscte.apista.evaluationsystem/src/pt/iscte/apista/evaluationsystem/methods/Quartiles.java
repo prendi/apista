@@ -89,8 +89,6 @@ public class Quartiles {
 //		indexesPlusOne[indexesPlusOne.length-1] = data.getTotalNotProposed();
 //		double[] unroll = unroll(indexesPlusOne);
 		double[] unroll = unroll(data.getIndexes());
-		for (int i = 0 ; i != unroll.length; i++)
-			System.out.println(unroll[i]);
 		q1 = q1(unroll);
 		q2 = median(unroll);
 		q3 = q3(unroll);
