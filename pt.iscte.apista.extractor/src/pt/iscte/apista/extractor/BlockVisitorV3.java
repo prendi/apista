@@ -57,13 +57,10 @@ public class BlockVisitorV3 extends ASTVisitor{
 	
 	private int blockLine = -1;
 	
+	private int currentLine = - 1;
+	
 	public BlockVisitorV3(Analyzer analizer) {
 		this(analizer, analizer.getPackageRoot());
-	}
-	
-	public BlockVisitorV3(Analyzer analyzer, String packageRoot){
-		this.analyzer = analyzer;
-		this.packageRoot = packageRoot;
 	}
 	
 	public BlockVisitorV3(int line) {
@@ -72,12 +69,11 @@ public class BlockVisitorV3 extends ASTVisitor{
 		
 	}
 	
-	public BlockVisitorV3(Analyzer analyzer, String packageRoot,
-			List<String> existingImports) {
-		this(analyzer, packageRoot);
-		this.existingImports = existingImports;
+	public BlockVisitorV3(Analyzer analyzer, String packageRoot){
+		this.analyzer = analyzer;
+		this.packageRoot = packageRoot;
 	}
-
+	
 	private int conditionalNesting = 0;
 	private Multimap<ASTNode, ASTNode> depsMap = ArrayListMultimap.create();
 	private Map<ASTNode, InstructionLine> instMap = new LinkedHashMap<>();
@@ -112,8 +108,31 @@ public class BlockVisitorV3 extends ASTVisitor{
 	}
 	
 	@Override
+	public void preVisit(ASTNode node) {
+		currentLine = getLineNumber(node);
+		if(withinRange(node) && isNestedStatement(node)){
+			conditionalNesting++;
+		}
+		if(node instanceof EnhancedForStatement){
+			SimpleName nodeName = ((EnhancedForStatement) node).getParameter().getName();
+			if(includePackage(nodeName.resolveTypeBinding()))
+				varMap.put(nodeName.getIdentifier(), ((EnhancedForStatement) node).getExpression());
+		}
+	}
+	
+	private boolean includePackage(ITypeBinding typeBinding) {
+		if(typeBinding!=null){
+			IPackageBinding packageBinding = typeBinding.getPackage();
+			if(packageBinding == null)
+				return false;
+
+			return packageBinding.getName().startsWith(packageRoot);
+		}
+		return false;
+	}
+	
+	@Override
 	public boolean visit(Block node){
-		// ideia: parametros como features
 		boolean visit = 
 				node.getParent() instanceof MethodDeclaration || withinRange(node)
 				&& (node.getParent() instanceof DoStatement || isNestedStatement(node.getParent()))
@@ -124,7 +143,7 @@ public class BlockVisitorV3 extends ASTVisitor{
 			startLine = getLineNumber(node);
 			endLine = getEndLineNumber(node);
 			
-			if(blockLine != -1 && (blockLine < startLine || blockLine > endLine))
+			if(blockLine != -1 && (blockLine < startLine || blockLine > endLine))//|| endLine-startLine > 200
 				return false;
 		}
 		return visit;
@@ -218,16 +237,7 @@ public class BlockVisitorV3 extends ASTVisitor{
 				|| node instanceof EnhancedForStatement;
 	}
 	
-	private boolean includePackage(ITypeBinding typeBinding) {
-		if(typeBinding!=null){
-			IPackageBinding packageBinding = typeBinding.getPackage();
-			if(packageBinding == null)
-				return false;
-
-			return packageBinding.getName().startsWith(packageRoot);
-		}
-		return false;
-	}
+	
 	
 	@Override
 	public boolean visit(ImportDeclaration node) {
@@ -245,7 +255,7 @@ public class BlockVisitorV3 extends ASTVisitor{
 	
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
-		final BlockVisitorV3 visitor = new BlockVisitorV3(analyzer, packageRoot, existingImports);
+		final BlockVisitorV3 visitor = new BlockVisitorV3(analyzer, packageRoot);
 		List<Object> bodyDecs = node.bodyDeclarations();
 		for(Object dec: bodyDecs)
 			if(dec instanceof MethodDeclaration)
@@ -276,8 +286,7 @@ public class BlockVisitorV3 extends ASTVisitor{
 		
 		if(node.getParent().getClass().equals(CompilationUnit.class))
 			return true;
-		
-		final BlockVisitorV3 visitor = new BlockVisitorV3(analyzer, packageRoot, existingImports);
+		final BlockVisitorV3 visitor = new BlockVisitorV3(analyzer, packageRoot);
 		List<Object> bodyDecs = node.bodyDeclarations();
 		for(Object dec: bodyDecs)
 			if(dec instanceof MethodDeclaration)
@@ -401,27 +410,27 @@ public class BlockVisitorV3 extends ASTVisitor{
 
 	@Override
 	public void endVisit(MethodInvocation node) {
+		
 		Expression e = node.getExpression();
 		if(e != null) {
 			ITypeBinding binding = e.resolveTypeBinding();
+				
 			if(includePackage(binding)) {
-				Instruction inst = new MethodInstruction(node, binding);
+				IMethodBinding mBinding = node.resolveMethodBinding();
+				boolean isStatic = mBinding != null && Modifier.isStatic(mBinding.getModifiers());
+				Instruction inst = new MethodInstruction(node, binding, isStatic);
 				InstructionLine instLine = new InstructionLine(inst, inst.line);
 				addInstruction(node, instLine);
+				
 			}
 		}
+		
 	}
 	
-	@Override
-	public void preVisit(ASTNode node) {
-		if(withinRange(node) && isNestedStatement(node)){
-			conditionalNesting++;
-		}
-		if(node instanceof EnhancedForStatement){
-			SimpleName nodeName = ((EnhancedForStatement) node).getParameter().getName();
-			if(includePackage(nodeName.resolveTypeBinding()))
-				varMap.put(nodeName.getIdentifier(), ((EnhancedForStatement) node).getExpression());
-		}
+	
+	
+	public int getCurrentLine() {
+		return currentLine;
 	}
 	
 	@Override
