@@ -3,6 +3,7 @@ package pt.iscte.apista.extractor;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -27,7 +28,11 @@ public class ApiVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		if (Modifier.isAbstract(node.getModifiers()) || !Modifier.isPublic(node.getModifiers()))
 			return false;
-		ITypeBinding binding = node.resolveBinding().getDeclaringClass();
+		ASTNode decClazz = node.getParent();
+		while(!(decClazz instanceof TypeDeclaration))
+			decClazz = decClazz.getParent();
+		ITypeBinding binding = ((TypeDeclaration) decClazz).resolveBinding();
+		//ITypeBinding binding = node.resolveBinding().getDeclaringClass();
 		String operation = node.isConstructor() ? "new" : node.getName().toString();
 		words.add(binding.getName() + "." + operation);
 		
