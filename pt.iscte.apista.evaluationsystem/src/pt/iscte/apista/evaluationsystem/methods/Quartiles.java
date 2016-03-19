@@ -114,7 +114,8 @@ public class Quartiles {
 
 	private static double q1(double[] v) {
 		if(v.length == 0)
-			throw new IllegalArgumentException("zero-length array");
+			return 20;
+			//throw new IllegalArgumentException("zero-length array");
 		else if(v.length == 1)
 			return v[0];
 
@@ -123,7 +124,8 @@ public class Quartiles {
 
 	private static double median(double[] v) {
 		if(v.length == 0)
-			throw new IllegalArgumentException("zero-length array");
+			return 20;
+			//throw new IllegalArgumentException("zero-length array");
 		else if(v.length == 1)
 			return v[0];
 		
@@ -132,7 +134,8 @@ public class Quartiles {
 
 	private static double q3(double[] v) {
 		if(v.length == 0)
-			throw new IllegalArgumentException("zero-length array");
+			return 20;
+			//throw new IllegalArgumentException("zero-length array");
 		else if(v.length == 1)
 			return v[0];
 		
@@ -142,6 +145,10 @@ public class Quartiles {
 
 	private static double median(int i, int j, double[] v) {
 		assert v.length > 1 && i <= j;
+		if (v.length == 0)
+			return 20;
+		else if (v.length == 1)
+			return v[0];
 		int len = j - i + 1;
 		int h  = len/2;
 		return len % 2 == 0 ? (v[i + h] + v[i + h - 1]) / 2.0 : v[i + h];
@@ -149,6 +156,10 @@ public class Quartiles {
 	
 	private static double percentile(double[] v, double p) {
 		assert p >= 0.0 && p <= 1.0;
+		if (v.length == 0)
+			return 20;
+		else if (v.length == 1)
+			return v[0];
 		int i = (int) ((v.length-1)*p);
 		return v[i];
 	}

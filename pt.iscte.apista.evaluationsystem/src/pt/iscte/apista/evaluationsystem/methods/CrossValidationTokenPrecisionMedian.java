@@ -67,11 +67,16 @@ public class CrossValidationTokenPrecisionMedian extends ACrossEvaluationMethod 
 		String fileName = configuration.getOutputFolder() + "CrossValidation_HitRank.txt";
 		
 		Map<Instruction, EvaluationData> tokenAggrData = dividePerToken(dataList, configuration.getMaxProposals());
-
+		int notEvaluated = 0;
 		Map<Instruction, Quartiles> quartilesMap = new HashMap<>();
-		for(Entry<Instruction, EvaluationData> e : tokenAggrData.entrySet())
-			quartilesMap.put(e.getKey(), new Quartiles(e.getValue()));
-		
+		for(Entry<Instruction, EvaluationData> e : tokenAggrData.entrySet()) {
+			if (!emptyIndexes(e.getValue().getIndexes())) {
+				quartilesMap.put(e.getKey(), new Quartiles(e.getValue()));
+			} else {
+				notEvaluated++;
+			}
+		}
+					
 		Quartiles medQuartiles = Quartiles.medianOf(quartilesMap.values());
 		
 		try {
@@ -91,10 +96,21 @@ public class CrossValidationTokenPrecisionMedian extends ACrossEvaluationMethod 
 				medQuartiles.getPercentile(90));
 			
 			out.close();
+			
+			System.out.println("NOT EVALUATED: " + notEvaluated);
 		} catch (IOException e1) {
 			System.out.println("Problem creating report file on " + fileName);
 		}
 		return null;
+	}
+
+	private boolean emptyIndexes(int[] indexes) {
+		for (int i = 0; i != indexes.length; i++) {
+			if (indexes[i] != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
