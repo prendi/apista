@@ -73,7 +73,7 @@
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
 	<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}"
-		memoryMaximumSize="2048m">
+		memoryMaximumSize="3072m">
             <src path="src"/>
             <classpath>
                     <path refid="Plug-in Dependencies.libraryclasspath"/>
